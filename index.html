@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B0A14">
+<title>Singlish</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Gentium+Book+Plus&display=swap">
+<style>
+/* A night-mode music app on purpose: one dark look, lit by the current song's cover art. */
+:root{
+  color-scheme:dark;
+  --bg:#0B0A14; --glass:rgba(255,255,255,.055); --glass-2:rgba(255,255,255,.1); --glass-3:rgba(255,255,255,.16);
+  --stroke:rgba(255,255,255,.09); --stroke-2:rgba(255,255,255,.18);
+  --ink:#F7F5FF; --soft:#D4D0EC; --muted:#928EB3; --dim:#5D5A7C;
+  --hot:#FF4D8D; --coral:#FF7A59; --amber:#FFB547; --hl:#FFE14A; --hl-ink:#1D1426;
+  --grad:linear-gradient(95deg,var(--hot),var(--coral) 55%,var(--amber));
+  --f-display:"Bricolage Grotesque","Avenir Next","PingFang SC",system-ui,sans-serif;
+  --f-body:"Figtree",-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --f-ipa:"Gentium Book Plus","Charis SIL","Lucida Sans Unicode","Segoe UI",serif;
+  --ctl-h:76px;
+  --art:none;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+a{color:var(--amber)}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ambient cover-art glow behind everything */
+.ambient{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.ambient i{position:absolute;inset:-15%;background:center/cover no-repeat;filter:blur(90px) saturate(1.7);opacity:0;transition:opacity 1.2s ease;transform:scale(1.1)}
+.ambient i.show{opacity:.5}
+.ambient::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 70% 0%,transparent,var(--bg) 75%)}
+.top,.app,.start{position:relative;z-index:1}
+
+/* ---------- header ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;gap:18px;padding:14px 28px;
+  background:color-mix(in srgb,var(--bg) 62%,transparent);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-bottom:1px solid var(--stroke)}
+.logo{display:flex;align-items:center;gap:10px;min-width:0}
+.logo h1{margin:0;font:800 24px/1 var(--f-display);letter-spacing:-.03em;white-space:nowrap}
+.logo h1 span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.eq{display:inline-flex;align-items:flex-end;gap:3px;height:20px}
+.eq i{width:4px;height:6px;border-radius:2px;background:var(--grad);transition:height .3s}
+body.is-playing .eq i{animation:eq .8s ease-in-out infinite alternate}
+.eq i:nth-child(2){animation-delay:-.2s!important}.eq i:nth-child(3){animation-delay:-.45s!important}.eq i:nth-child(4){animation-delay:-.1s!important}
+@keyframes eq{0%{height:4px}100%{height:20px}}
+.tagline{margin:0;color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .grow{flex:1}
+.prog{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.prog b{color:var(--ink);font-weight:700}
+.prog-bar{width:120px;height:6px;border-radius:99px;background:var(--glass-2);overflow:hidden}
+.prog-bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:inherit;transition:width .6s cubic-bezier(.3,.7,.3,1)}
+.btn-list{display:none;border:1px solid var(--stroke-2);background:var(--glass);border-radius:999px;padding:7px 15px;font-size:13px;font-weight:700}
+
+/* ---------- layout ---------- */
+.app{display:grid;grid-template-columns:minmax(0,1fr) minmax(400px,470px);gap:32px;padding:24px 28px 40px;align-items:start;max-width:1480px;margin:0 auto}
+.browser{min-width:0}
+.filters{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.search{flex:1 1 240px;position:relative;min-width:0}
+.search svg{position:absolute;left:14px;top:50%;translate:0 -50%;color:var(--muted)}
+.search input{width:100%;height:42px;border:1px solid var(--stroke);background:var(--glass);color:var(--ink);border-radius:999px;padding:0 16px 0 40px;font:inherit;font-size:14px}
+.search input::placeholder{color:var(--muted)}
+.search input:focus{outline:none;border-color:var(--stroke-2);background:var(--glass-2)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips button{height:34px;border:1px solid var(--stroke);background:transparent;border-radius:999px;padding:0 14px;font-size:13px;font-weight:600;color:var(--soft)}
+.chips button:hover{background:var(--glass)}
+.chips button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.count{font-size:12px;color:var(--muted);margin:0 0 14px;letter-spacing:.08em;text-transform:uppercase}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(186px,1fr));gap:14px}
+
+/* card = record sleeve with the song's disc peeking out */
+.card{--r:18px;position:relative;overflow:hidden;text-align:left;border:1px solid var(--stroke);background:var(--glass);border-radius:var(--r);padding:16px 16px 14px;display:flex;flex-direction:column;gap:3px;min-height:150px;
+  transition:transform .2s cubic-bezier(.3,.7,.3,1),background .2s,border-color .2s}
+.card:hover{transform:translateY(-3px) rotate(-.4deg);background:var(--glass-2);border-color:var(--stroke-2)}
+.card .disc{position:absolute;top:-18px;right:-18px;width:78px;height:78px;border-radius:50%;overflow:hidden;
+  background:#111;box-shadow:0 0 0 5px rgba(0,0,0,.55),0 6px 18px rgba(0,0,0,.5);transition:transform .35s cubic-bezier(.3,.7,.3,1)}
+.card .disc img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.15)}
+.card .disc::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,var(--bg) 0 5px,rgba(0,0,0,.35) 6px 11px,transparent 12px),repeating-radial-gradient(circle,rgba(0,0,0,.14) 0 1px,transparent 1px 4px)}
+.card:hover .disc{transform:translate(-6px,6px) rotate(40deg)}
+.card.playing .disc{animation:spin 3.2s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.card .no{font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.08em;font-variant-numeric:tabular-nums}
+.card .w{margin-top:10px;font:700 24px/1.05 var(--f-display);letter-spacing:-.025em;overflow-wrap:anywhere;padding-right:30px}
+.card .ph{font:14px/1.3 var(--f-ipa);color:var(--muted)}
+.card .mn{font-size:13px;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .sg{margin-top:auto;padding-top:10px;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .sg b{color:var(--soft);font-weight:600}
+.card.done .no::after{content:"  ✓ 已唱";color:var(--amber);letter-spacing:.04em}
+.card.on{border-color:transparent;background:linear-gradient(var(--bg),var(--bg)) padding-box,var(--grad) border-box;border:1.5px solid transparent}
+.card.on .w{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.empty{color:var(--muted);padding:40px 0;text-align:center;grid-column:1/-1}
+
+/* ---------- now playing ---------- */
+.aside{position:sticky;top:calc(env(safe-area-inset-top,0px) + 86px);display:flex;flex-direction:column;gap:14px}
+.screen{position:relative;border-radius:22px;overflow:hidden;background:#000;aspect-ratio:16/9;max-width:100%;box-shadow:0 20px 60px rgba(0,0,0,.55),0 0 0 1px var(--stroke)}
+.screen > div,.screen iframe{position:absolute;inset:0;width:100%;height:100%}
+.screen .clip{position:absolute;left:12px;top:12px;z-index:2;background:rgba(11,10,20,.72);backdrop-filter:blur(8px);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:4px 11px;font-variant-numeric:tabular-nums;pointer-events:none;display:flex;gap:6px;align-items:center}
+.screen .clip::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--hot);box-shadow:0 0 10px var(--hot)}
+.stage{position:relative;background:var(--glass);border:1px solid var(--stroke);border-radius:26px;padding:22px 24px 20px;display:flex;flex-direction:column;gap:12px;min-width:0;
+  backdrop-filter:blur(24px) saturate(1.3);-webkit-backdrop-filter:blur(24px) saturate(1.3)}
+.st-top{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.pill{font-size:11.5px;font-weight:700;letter-spacing:.04em;border-radius:999px;padding:3px 10px;background:var(--glass-2);color:var(--soft)}
+.pill.band{background:var(--grad);color:#1A0C14}
+.st-top .no{margin-left:auto;font-size:12px;font-weight:700;color:var(--dim);font-variant-numeric:tabular-nums}
+.st-word{margin:2px 0 0;font:800 clamp(40px,4.4vw,58px)/.95 var(--f-display);letter-spacing:-.045em;overflow-wrap:anywhere}
+.st-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.st-ipa{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--stroke-2);background:transparent;border-radius:999px;padding:4px 12px 4px 10px;font:16px/1.4 var(--f-ipa);color:var(--soft);transition:background .2s,color .2s}
+.st-ipa:hover{background:var(--ink);color:var(--bg)}
+.st-mean{margin:0;font-size:17px;font-weight:700}
+.st-en{margin:-4px 0 0;color:var(--muted);font-size:14px}
+
+.lyrics{position:relative;height:190px;overflow:hidden;margin:4px -4px 0;padding:0 4px}
+.stage.live .lyrics{-webkit-mask-image:linear-gradient(transparent,#000 22%,#000 78%,transparent);mask-image:linear-gradient(transparent,#000 22%,#000 78%,transparent)}
+.lyrics-in{padding:6px 0;transition:transform .55s cubic-bezier(.3,.7,.3,1)}
+.stage.live .lyrics-in{padding:70px 0}
+.ln{margin:0;padding:5px 0;font:700 20px/1.35 var(--f-display);letter-spacing:-.01em;color:var(--soft);isolation:isolate;transform-origin:left center;transition:transform .4s cubic-bezier(.3,.7,.3,1),opacity .4s,color .4s}
+.stage.live .ln{color:var(--dim)}
+.stage.live .ln.cur{color:var(--ink);transform:scale(1.06)}
+.stage.live .ln.past{color:var(--muted);opacity:.6}
+.lw{--p:0}
+.stage.live .ln.cur .lw:not(.tw){background:var(--grad) 0 0/calc(var(--p)*100%) 100% no-repeat,linear-gradient(var(--ink),var(--ink));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tw{position:relative;white-space:nowrap;color:var(--hl-ink)!important;padding:0 .12em;margin:0 -.04em}
+.tw::before{content:"";position:absolute;inset:.1em -.02em .02em;background:var(--hl);border-radius:.28em .18em .32em .2em;transform:skew(-7deg) rotate(-1.2deg);z-index:-1;box-shadow:0 0 22px rgba(255,225,74,.35)}
+.stage.live .ln.cur .tw.hit::before{animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{0%{transform:skew(-7deg) rotate(-1.2deg) scale(1)}45%{transform:skew(-7deg) rotate(-3deg) scale(1.18)}100%{transform:skew(-7deg) rotate(-1.2deg) scale(1)}}
+.lyr-msg{color:var(--muted);font-size:13px;padding:10px 0}
+
+.st-song{display:flex;align-items:center;gap:12px;padding:10px;border-radius:16px;background:rgba(0,0,0,.22);min-width:0}
+.st-song .mini{flex:none;width:42px;height:42px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 3px rgba(0,0,0,.5)}
+body.is-playing .stage.live .st-song .mini{animation:spin 3.2s linear infinite}
+.st-song div{min-width:0;display:flex;flex-direction:column}
+.st-song b{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-song span{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-note{margin:0;font-size:13px;color:var(--soft)}
+.st-tip{font-size:13.5px;color:var(--soft);border:1px dashed var(--stroke-2);border-radius:14px;padding:9px 12px}
+.st-tip b{font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--amber);margin-right:8px}
+
+/* ---------- controls ---------- */
+.ctl{display:flex;align-items:center;gap:4px;background:var(--glass);border:1px solid var(--stroke);border-radius:999px;padding:8px 14px 8px 8px;
+  backdrop-filter:blur(24px) saturate(1.3);-webkit-backdrop-filter:blur(24px) saturate(1.3)}
+.ctl button{border:0;background:transparent;border-radius:999px;height:42px;min-width:42px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 10px;color:var(--soft);font-size:13px;font-weight:700;transition:background .15s,color .15s}
+.ctl button:hover{background:var(--glass-2);color:var(--ink)}
+.ctl .play{background:var(--grad);color:#1A0C14;width:54px;height:54px;box-shadow:0 8px 26px rgba(255,77,141,.45)}
+.ctl .play:hover{background:var(--grad);color:#1A0C14;transform:scale(1.05)}
+.ctl .tog[aria-pressed="true"]{color:var(--bg);background:var(--ink)}
+.ctl .time{margin-left:auto;font-size:12px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.hint{font-size:12px;color:var(--muted);margin:0;padding:0 8px}
+.hint kbd{font:600 11px var(--f-body);border:1px solid var(--stroke-2);border-bottom-width:2px;border-radius:5px;padding:0 5px;color:var(--soft)}
+.foot{grid-column:1/-1;font-size:12px;color:var(--dim);border-top:1px solid var(--stroke);padding-top:16px;max-width:80ch}
+.carousel{display:none}
+.start{display:none}
+.browser-head{display:none;align-items:center;justify-content:space-between;margin-bottom:14px}
+.browser-head h2{margin:0;font:800 26px var(--f-display);letter-spacing:-.03em}
+.browser-head button{border:1px solid var(--stroke-2);background:var(--glass);border-radius:999px;padding:7px 15px;font-weight:700;font-size:13px}
+
+/* ---------- phone ---------- */
+@media (max-width:899px){
+  body{overflow:hidden;display:flex;flex-direction:column;height:100%}
+  .top{padding:10px 16px;gap:10px;flex:none}
+  .logo h1{font-size:21px}
+  .tagline,.prog-bar{display:none}
+  .btn-list{display:inline-block}
+  .app{display:flex;flex-direction:column;padding:0;flex:1;min-height:0;min-width:0;gap:0;width:100%;max-width:100vw}
+  .aside{position:static;display:contents}
+  #deskStage,.hint,.foot{display:none}
+  .screen{flex:none;margin:12px 16px 0;border-radius:18px;max-height:30dvh;aspect-ratio:16/9;width:auto;align-self:stretch}
+  .browser{position:fixed;inset:0;z-index:40;background:var(--bg);overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 14px) 16px calc(env(safe-area-inset-bottom,0px) + 24px);display:none}
+  .browser.open{display:block}
+  .browser-head{display:flex}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .card .w{font-size:21px}
+  .carousel{display:flex;flex:1;min-height:0;width:100%;min-width:0;max-width:100vw;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;
+    padding-bottom:calc(var(--ctl-h) + env(safe-area-inset-bottom,0px) + 8px)}
+  .carousel::-webkit-scrollbar{display:none}
+  .slide{flex:0 0 100%;scroll-snap-align:center;scroll-snap-stop:always;padding:12px 16px 4px;display:flex;overflow-y:auto}
+  .slide .stage{flex:1;padding:18px;gap:10px;min-height:100%;border-radius:24px}
+  .st-word{font-size:44px}
+  .slide .lyrics{height:auto;flex:1;min-height:150px}
+  .ln{font-size:19px}
+  .ctl{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:30;height:var(--ctl-h);padding:8px 12px 8px 10px;background:color-mix(in srgb,var(--bg) 70%,transparent)}
+  .ctl .opt-label{display:none}
+  .start{display:flex;position:fixed;inset:0;z-index:35;align-items:flex-end;justify-content:center;padding:0 16px calc(var(--ctl-h) + env(safe-area-inset-bottom,0px) + 28px);background:linear-gradient(transparent 40%,rgba(11,10,20,.85))}
+  .start button{border:0;background:var(--grad);color:#1A0C14;border-radius:999px;padding:15px 26px;font-weight:800;font-size:17px;box-shadow:0 12px 36px rgba(255,77,141,.5);display:flex;flex-direction:column;align-items:center;gap:1px}
+  .start button small{font-weight:600;font-size:12px;opacity:.8}
+}
+@media (max-width:420px){ .ctl .time{display:none} }
+@media (prefers-reduced-motion:reduce){ *,*::before{animation:none!important;transition:none!important} }
+</style>
+</head>
+<body>
+<div class="ambient" aria-hidden="true"><i id="artA"></i><i id="artB"></i></div>
+
+<header class="top">
+  <div class="logo"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><h1>Sing<span>lish</span></h1></div>
+  <p class="tagline">听歌记单词 · 每个雅思词都藏在一段流行歌里</p>
+  <div class="grow"></div>
+  <div class="prog"><div class="prog-bar"><i id="progFill"></i></div><span><b id="doneCount">0</b> / <span id="totalCount">100</span> 已唱</span></div>
+  <button class="btn-list" id="openList" type="button">词表</button>
+</header>
+
+<main class="app">
+  <section class="browser" id="browser" aria-label="单词列表">
+    <div class="browser-head"><h2>词表</h2><button type="button" id="closeList">关闭</button></div>
+    <div class="filters">
+      <label class="search"><span class="sr">搜索</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="搜单词、释义、歌名或歌手" autocomplete="off"></label>
+      <div class="chips" id="bandChips" role="group" aria-label="按雅思分段筛选">
+        <button type="button" data-b="" aria-pressed="true">全部</button>
+        <button type="button" data-b="5.5" aria-pressed="false">5.5–6</button>
+        <button type="button" data-b="6.5" aria-pressed="false">6.5</button>
+        <button type="button" data-b="7" aria-pressed="false">7+</button>
+      </div>
+    </div>
+    <p class="count" id="countLine"></p>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <aside class="aside">
+    <div class="screen"><div id="yt"></div><span class="clip" id="clipTag" hidden></span></div>
+    <div id="deskStage"></div>
+    <div class="ctl" id="ctl">
+      <button type="button" class="play" id="play" aria-label="播放"><svg id="icoPlay" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 4.8v14.4c0 .8.9 1.3 1.6.8l11-7.2a1 1 0 0 0 0-1.6l-11-7.2C8.9 3.5 8 4 8 4.8z"/></svg><svg id="icoPause" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" hidden><rect x="6" y="4" width="4.5" height="16" rx="1.5"/><rect x="13.5" y="4" width="4.5" height="16" rx="1.5"/></svg></button>
+      <button type="button" id="prev" aria-label="上一个"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="2.6" height="14" rx="1.2"/><path d="M19 6.2v11.6c0 .8-.9 1.3-1.6.8L9.6 13.3a1.5 1.5 0 0 1 0-2.6l7.8-5.3c.7-.5 1.6 0 1.6.8z"/></svg></button>
+      <button type="button" id="next" aria-label="下一个"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="16.4" y="5" width="2.6" height="14" rx="1.2"/><path d="M5 6.2v11.6c0 .8.9 1.3 1.6.8l7.8-5.3a1.5 1.5 0 0 0 0-2.6L6.6 5.4C5.9 4.9 5 5.4 5 6.2z"/></svg></button>
+      <button type="button" id="replay" aria-label="重播片段"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4h4"/></svg></button>
+      <button type="button" class="tog" id="loop" aria-pressed="false" aria-label="片段循环"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l3 3-3 3"/><path d="M4 11V9a4 4 0 0 1 4-4h12"/><path d="M7 22l-3-3 3-3"/><path d="M20 13v2a4 4 0 0 1-4 4H4"/></svg><span class="opt-label">循环</span></button>
+      <button type="button" class="tog" id="auto" aria-pressed="false" aria-label="唱完自动下一个"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="opt-label">连播</span></button>
+      <span class="time" id="time">0:00 / 0:00</span>
+    </div>
+    <p class="hint">点卡片就开唱 · <kbd>←</kbd> <kbd>→</kbd> 切换 · <kbd>空格</kbd> 暂停</p>
+  </aside>
+
+  <div class="carousel" id="carousel" aria-label="左右滑动切换单词"></div>
+
+  <p class="foot">歌曲片段通过 YouTube 播放器播放，逐行时间轴歌词实时取自 LRCLIB 公共歌词库，词曲版权归原作者及唱片公司。每个片段只截取唱到目标词的前后几句，行内逐词高亮为按时长估算。</p>
+</main>
+
+<div class="start" id="start"><button type="button" id="startBtn">轻触开唱<small>左右滑动，换个词、换首歌</small></button></div>
+
+<script>
+window.SONG_WORDS = [{"word":"absurd","form":"absurd","phonetic":"/əbˈsɜːd/","pos":"adj.","meaning":"荒谬的；荒唐的","formNote":"","en":"Completely unreasonable or ridiculous.","tip":"It is absurd to do… 做…是荒谬的","band":7,"artist":"Five for Fighting","title":"Superman (It's Not Easy)","lrclib":1122659,"t":72.62,"videoId":"eZerzGMWSxU"},{"word":"affection","form":"affection","phonetic":"/əˈfekʃn/","pos":"n.","meaning":"喜爱；感情","formNote":"","en":"A feeling of liking and caring for someone.","tip":"show affection for sb 对某人表露喜爱","band":6.5,"artist":"Robbie Williams","title":"Angels","lrclib":598239,"t":65.57,"videoId":"pv-XrJkUKY0"},{"word":"anxious","form":"anxious","phonetic":"/ˈæŋkʃəs/","pos":"adj.","meaning":"焦虑的；渴望的","formNote":"","en":"Worried and nervous about something.","tip":"be anxious about 担心…；anxiety n.","band":6,"artist":"Shawn Mendes","title":"In My Blood","lrclib":1007741,"t":83.5,"videoId":"D9Fq68qMMBM"},{"word":"approach","form":"approach","phonetic":"/əˈprəʊtʃ/","pos":"n.","meaning":"方法；途径","formNote":"","en":"A way of dealing with something.","tip":"approach to sth 解决…的方法","band":6,"artist":"X Ambassadors","title":"Unsteady","lrclib":1017893,"t":46.05,"videoId":"7bJ6aE1Hk9Q"},{"word":"architecture","form":"architecture","phonetic":"/ˈɑːkɪtektʃə/","pos":"n.","meaning":"建筑学；建筑风格","formNote":"","en":"The design and style of buildings.","tip":"modern architecture 现代建筑；architect n.","band":6,"artist":"George Ezra","title":"Shotgun","lrclib":516025,"t":19.08,"videoId":"v_B3qkp4nO4"},{"word":"assume","form":"assume","phonetic":"/əˈsjuːm/","pos":"v.","meaning":"假定；承担","formNote":"","en":"To believe something is true without proof.","tip":"assumption n. 假设；assume responsibility","band":6,"artist":"Taylor Swift","title":"Cardigan","lrclib":589865,"t":14.02,"videoId":"zLSUp53y-HQ"},{"word":"assure","form":"assure","phonetic":"/əˈʃɔː/","pos":"v.","meaning":"向…保证；使确信","formNote":"","en":"To tell someone confidently that something is true.","tip":"assure sb of sth 向某人保证…","band":6.5,"artist":"Andy Grammer","title":"Honey, I'm Good.","lrclib":1700458,"t":126.15,"videoId":"w-99JEIwZq0"},{"word":"atmosphere","form":"atmosphere","phonetic":"/ˈætməsfɪə/","pos":"n.","meaning":"气氛；大气层","formNote":"","en":"The mood of a place; the air around Earth.","tip":"a relaxed atmosphere 轻松的氛围","band":6,"artist":"Harry Styles","title":"Sign of the Times","lrclib":1017792,"t":119.49000000000001,"videoId":"qN4ooNx77u0"},{"word":"attach","form":"attached","phonetic":"/əˈtætʃ/","pos":"v.","meaning":"附上；使依恋","formNote":"attached 为形容词/过去分词：依恋的；附加的","en":"To fasten or join one thing to another.","tip":"be attached to sb 依恋某人","band":6,"artist":"Lil Nas X","title":"Old Town Road","lrclib":9064,"t":29.25,"videoId":"sOkHxILr5DA"},{"word":"betray","form":"betrayed","phonetic":"/bɪˈtreɪ/","pos":"v.","meaning":"背叛；泄露","formNote":"betrayed 为过去式/过去分词：被背叛的","en":"To be disloyal to someone who trusts you.","tip":"betray sb's trust 辜负某人的信任","band":7,"artist":"Olivia Rodrigo","title":"traitor","lrclib":1209020,"t":56.92,"videoId":"6tsu2oeZJgo"},{"word":"blossom","form":"blossom","phonetic":"/ˈblɒsəm/","pos":"v.","meaning":"开花；繁荣发展","formNote":"","en":"To produce flowers; to develop successfully.","tip":"blossom into 发展成为…","band":7,"artist":"Fall Out Boy","title":"Centuries","lrclib":561383,"t":115.11,"videoId":"FSJHJmxd8Bw"},{"word":"bond","form":"bonds","phonetic":"/bɒnd/","pos":"n.","meaning":"纽带；联系","formNote":"bonds 为名词复数：纽带；债券","en":"A close connection between people.","tip":"strengthen the bond between 加强…联系","band":6.5,"artist":"Panic! At The Disco","title":"Hey Look Ma, I Made It","lrclib":1045831,"t":28.38,"videoId":"OcDqvp7PWQ4"},{"word":"burden","form":"burdened","phonetic":"/ˈbɜːdn/","pos":"n.","meaning":"负担；重担","formNote":"burdened 为形容词/过去分词：负担沉重的","en":"A heavy load or difficult responsibility.","tip":"be a burden on sb 成为某人的负担","band":6.5,"artist":"Westlife","title":"You Raise Me Up","lrclib":1781866,"t":16.84,"videoId":"9bxc9hbwkkw"},{"word":"career","form":"career's","phonetic":"/kəˈrɪə/","pos":"n.","meaning":"职业；生涯","formNote":"career's 为名词所有格：职业生涯的","en":"The series of jobs in a person's working life.","tip":"pursue a career in 从事…职业","band":5.5,"artist":"Olivia Rodrigo","title":"good 4 u","lrclib":1625,"t":60.95,"videoId":"aeDdS9aIpck"},{"word":"catastrophe","form":"catastrophe","phonetic":"/kəˈtæstrəfi/","pos":"n.","meaning":"大灾难；灾祸","formNote":"","en":"A sudden event causing terrible damage.","tip":"environmental catastrophe 环境灾难","band":7,"artist":"Alicia Keys","title":"Girl on Fire","lrclib":1006124,"t":15.88,"videoId":"mVuSfxqpZa4"},{"word":"collide","form":"collided","phonetic":"/kəˈlaɪd/","pos":"v.","meaning":"碰撞；冲突","formNote":"collided 为过去式/过去分词","en":"To hit something violently while moving.","tip":"collide with 与…相撞；collision n.","band":7,"artist":"Train","title":"Hey, Soul Sister","lrclib":961117,"t":40,"videoId":"kVpv8-5XWOI"},{"word":"combine","form":"combined","phonetic":"/kəmˈbaɪn/","pos":"v.","meaning":"结合；联合","formNote":"combined 为形容词/过去分词：联合的；合计的","en":"To join two or more things together.","tip":"combine A with B 将A与B结合","band":6,"artist":"Noah Kahan","title":"Stick Season","lrclib":2946040,"t":3.76,"videoId":"iWG6apzIWAk"},{"word":"commit","form":"committed","phonetic":"/kəˈmɪt/","pos":"v.","meaning":"犯（罪）；承诺","formNote":"committed 为形容词：尽心尽力的；坚定的","en":"To do something wrong; to promise to do something.","tip":"be committed to doing 致力于…","band":6,"artist":"Queen","title":"We Are the Champions","lrclib":20406,"t":7.19,"videoId":"62v4y43D-3k"},{"word":"communicate","form":"communicating","phonetic":"/kəˈmjuːnɪkeɪt/","pos":"v.","meaning":"交流；传达","formNote":"communicating 为现在分词/动名词","en":"To share information, ideas or feelings.","tip":"communicate with sb 与某人沟通","band":5.5,"artist":"Khalid","title":"Location","lrclib":1715989,"t":15.13,"videoId":"j0bbRsa-Y9E"},{"word":"complain","form":"complain","phonetic":"/kəmˈpleɪn/","pos":"v.","meaning":"抱怨；投诉","formNote":"","en":"To say that you are unhappy about something.","tip":"complain about sth 抱怨…；complaint n. 投诉","band":5.5,"artist":"ABBA","title":"The Winner Takes It All","lrclib":193735,"t":137.16,"videoId":"92cwKCU8Z5c"},{"word":"compromise","form":"compromise","phonetic":"/ˈkɒmprəmaɪz/","pos":"n.","meaning":"妥协；折中","formNote":"","en":"An agreement where each side gives up something.","tip":"reach a compromise 达成妥协","band":6.5,"artist":"Maroon 5","title":"She Will Be Loved","lrclib":14603,"t":100.84,"videoId":"v9RUp-gIxeM"},{"word":"confess","form":"confess","phonetic":"/kənˈfes/","pos":"v.","meaning":"坦白；承认","formNote":"","en":"To admit that you did something wrong.","tip":"confess to sth 承认…；confession n.","band":6.5,"artist":"OneRepublic","title":"Secrets","lrclib":587077,"t":21.54,"videoId":"xWUTOqpm0iI"},{"word":"confine","form":"confined","phonetic":"/kənˈfaɪn/","pos":"v.","meaning":"限制；禁闭","formNote":"confined 为形容词/过去分词：受限的；狭窄的","en":"To keep someone or something within limits.","tip":"be confined to 局限于…","band":7,"artist":"Muse","title":"Uprising","lrclib":80294,"t":72.07,"videoId":"d0KWiDGi_ek"},{"word":"confront","form":"confronted","phonetic":"/kənˈfrʌnt/","pos":"v.","meaning":"面对；对抗","formNote":"confronted 为过去式/过去分词：be confronted with 面临","en":"To face a difficult situation or person directly.","tip":"be confronted with a problem 面临问题","band":6.5,"artist":"Beyonce","title":"If I Were a Boy","lrclib":240036,"t":39.08,"videoId":"WEq5Dxk6mNI"},{"word":"consequence","form":"consequences","phonetic":"/ˈkɒnsɪkwəns/","pos":"n.","meaning":"后果；结果","formNote":"consequences 为名词复数","en":"A result, usually a bad one, of an action.","tip":"as a consequence 因此","band":6,"artist":"MGMT","title":"Kids","lrclib":68476,"t":80.75,"videoId":"XXoTaGmuap8"},{"word":"convince","form":"convince","phonetic":"/kənˈvɪns/","pos":"v.","meaning":"使信服；说服","formNote":"","en":"To make someone believe something is true.","tip":"convince sb of sth；convincing adj.","band":6,"artist":"Tame Impala","title":"The Less I Know the Better","lrclib":309184,"t":91,"videoId":"2SUwOgmvzK4"},{"word":"criticise","form":"criticized","phonetic":"/ˈkrɪtɪsaɪz/","pos":"v.","meaning":"批评；评论","formNote":"criticized 为过去式/过去分词（美式拼写）","en":"To say what is wrong with someone or something.","tip":"criticise sb for sth 因…批评某人","band":6,"artist":"Sia","title":"Titanium","lrclib":33859237,"t":31.39,"videoId":"u7eYBN_4-4Q"},{"word":"debt","form":"debt","phonetic":"/det/","pos":"n.","meaning":"债务；欠款","formNote":"","en":"Money that you owe someone.","tip":"be in debt 负债；pay off a debt 还清","band":6,"artist":"Sam Fender","title":"Seventeen Going Under","lrclib":1804488,"t":190.64,"videoId":"-DzHEJrdGJ8"},{"word":"deceive","form":"deceived","phonetic":"/dɪˈsiːv/","pos":"v.","meaning":"欺骗；蒙蔽","formNote":"deceived 为过去式/过去分词：被欺骗的","en":"To make someone believe something false.","tip":"deceive sb into doing 骗某人做…","band":7,"artist":"Rag'n'Bone Man","title":"Human","lrclib":944076,"t":43.86,"videoId":"Eb-69q8zK84"},{"word":"decent","form":"decently","phonetic":"/ˈdiːsnt/","pos":"adj.","meaning":"体面的；像样的","formNote":"decently 为副词：得体地；像样地","en":"Good enough, acceptable, or morally proper.","tip":"a decent salary 可观的薪水","band":6.5,"artist":"Jeremy Zucker","title":"comethru","lrclib":1178251,"t":14.19,"videoId":"23Tg0iskItY"},{"word":"dedicate","form":"dedicate","phonetic":"/ˈdedɪkeɪt/","pos":"v.","meaning":"奉献；致力于","formNote":"","en":"To give your time and energy to something.","tip":"dedicate oneself to doing 致力于…","band":6.5,"artist":"The Script","title":"Hall of Fame","lrclib":1025009,"t":41.45,"videoId":"ds6o9in_y-o"},{"word":"dignity","form":"dignity","phonetic":"/ˈdɪɡnəti/","pos":"n.","meaning":"尊严；庄重","formNote":"","en":"Self-respect and the respect of others.","tip":"with dignity 有尊严地","band":7,"artist":"Alec Benjamin","title":"Let Me Down Slowly","lrclib":1008426,"t":22.03,"videoId":"gEo8IrFbecM"},{"word":"disguise","form":"disguise","phonetic":"/dɪsˈɡaɪz/","pos":"v.","meaning":"伪装；掩饰","formNote":"","en":"To change appearance or hide the truth.","tip":"a blessing in disguise 因祸得福","band":7,"artist":"Taylor Swift","title":"Anti-Hero","lrclib":326,"t":92.24000000000001,"videoId":"XqN2qFvY64U"},{"word":"distort","form":"distorted","phonetic":"/dɪˈstɔːt/","pos":"v.","meaning":"扭曲；歪曲","formNote":"distorted 为形容词/过去分词：扭曲的","en":"To change the shape or truth of something.","tip":"distort the facts 歪曲事实","band":7,"artist":"Selena Gomez","title":"Lose You to Love Me","lrclib":1008714,"t":33.27,"videoId":"zlJDTxahav0"},{"word":"divine","form":"divine","phonetic":"/dɪˈvaɪn/","pos":"adj.","meaning":"神的；神圣的","formNote":"","en":"Coming from or relating to God or a god.","tip":"divine intervention 神的干预","band":7.5,"artist":"Jason Mraz","title":"I'm Yours","lrclib":13888,"t":29.25,"videoId":"dNOz_LUH770"},{"word":"eager","form":"eager","phonetic":"/ˈiːɡə/","pos":"adj.","meaning":"渴望的；热切的","formNote":"","en":"Wanting very much to do or have something.","tip":"be eager to do 渴望做…","band":6,"artist":"The Killers","title":"Mr. Brightside","lrclib":19780,"t":76.24,"videoId":"l7MaKmKJqoc"},{"word":"embrace","form":"embrace","phonetic":"/ɪmˈbreɪs/","pos":"v.","meaning":"拥抱；欣然接受","formNote":"","en":"To hug; to accept an idea eagerly.","tip":"embrace change 拥抱变化","band":7,"artist":"Leona Lewis","title":"Bleeding Love","lrclib":315902,"t":115.74000000000001,"videoId":"ow_NJdC-goI"},{"word":"envy","form":"envy","phonetic":"/ˈenvi/","pos":"v.","meaning":"羡慕；嫉妒","formNote":"","en":"To wish you had what someone else has.","tip":"be the envy of 令…羡慕；envious adj.","band":6.5,"artist":"Lorde","title":"Royals","lrclib":51203,"t":16.86,"videoId":"ncgsL1GCFms"},{"word":"eternal","form":"eternal","phonetic":"/ɪˈtɜːnl/","pos":"adj.","meaning":"永恒的；永久的","formNote":"","en":"Lasting forever, without an end.","tip":"eternal love 永恒的爱；eternity n. 永恒","band":6.5,"artist":"Alan Walker","title":"Faded","lrclib":86,"t":108.56,"videoId":"bDmzGLrdjxQ"},{"word":"evolve","form":"evolved","phonetic":"/iˈvɒlv/","pos":"v.","meaning":"进化；逐步发展","formNote":"evolved 为过去式/过去分词：进化了的","en":"To develop gradually over time.","tip":"evolve into 演变为；evolution n. 进化","band":6.5,"artist":"Gracie Abrams","title":"That's So True","lrclib":13456607,"t":58.65,"videoId":"W_YOJWZIjxo"},{"word":"excess","form":"excess","phonetic":"/ɪkˈses/","pos":"n.","meaning":"过量；超额","formNote":"","en":"An amount that is more than needed or allowed.","tip":"in excess of 超过；excessive adj. 过度的","band":7,"artist":"Mumford & Sons","title":"I Will Wait","lrclib":969351,"t":114.13,"videoId":"Vo7FNkltu28"},{"word":"explode","form":"exploding","phonetic":"/ɪkˈspləʊd/","pos":"v.","meaning":"爆炸；激增","formNote":"exploding 为现在分词/动名词","en":"To burst violently; to increase suddenly.","tip":"population explosion 人口激增","band":6,"artist":"Troye Sivan","title":"Youth","lrclib":1826917,"t":26.43,"videoId":"b2Od3osC8xs"},{"word":"feature","form":"features","phonetic":"/ˈfiːtʃə/","pos":"n.","meaning":"特征；特色","formNote":"features 为名词复数：特征；五官","en":"A typical or important part or quality.","tip":"a key feature of …的主要特点","band":5.5,"artist":"Lorde","title":"Solar Power","lrclib":701337,"t":24.99,"videoId":"H1u0ukFst60"},{"word":"frustrate","form":"frustrated","phonetic":"/frʌˈstreɪt/","pos":"v.","meaning":"使沮丧；挫败","formNote":"frustrated 为形容词/过去分词：感到沮丧的","en":"To make someone feel annoyed because they cannot succeed.","tip":"be frustrated with 对…沮丧；frustration n.","band":6.5,"artist":"Avril Lavigne","title":"Complicated","lrclib":13474,"t":71.35,"videoId":"ncVkvOuil2Y"},{"word":"guarantee","form":"guarantee","phonetic":"/ˌɡærənˈtiː/","pos":"v.","meaning":"保证；担保","formNote":"","en":"To promise that something will happen.","tip":"guarantee success 确保成功","band":6,"artist":"Jessie J","title":"Price Tag","lrclib":585566,"t":91.14,"videoId":"EaYbSO-52As"},{"word":"hollow","form":"hollowed","phonetic":"/ˈhɒləʊ/","pos":"adj.","meaning":"空心的；空洞的","formNote":"hollowed 为动词过去分词：被挖空的","en":"Empty inside; without real value or meaning.","tip":"hollow promises 空洞的承诺","band":7,"artist":"Cigarettes After Sex","title":"Apocalypse","lrclib":280009,"t":85.94,"videoId":"sElE_BfQ67s"},{"word":"identify","form":"identify","phonetic":"/aɪˈdentɪfaɪ/","pos":"v.","meaning":"识别；确认","formNote":"","en":"To recognise and name someone or something.","tip":"identify the cause 找出原因","band":6,"artist":"Twenty One Pilots","title":"Stressed Out","lrclib":1357,"t":76.85,"videoId":"Gc4sY98Jn9I"},{"word":"illusion","form":"illusion","phonetic":"/ɪˈluːʒn/","pos":"n.","meaning":"错觉；幻想","formNote":"","en":"A false idea or belief; something not real.","tip":"be under the illusion that 误以为…","band":7,"artist":"Natalie Imbruglia","title":"Torn","lrclib":91496,"t":62.34,"videoId":"AsaEqn1Czfc"},{"word":"imply","form":"imply","phonetic":"/ɪmˈplaɪ/","pos":"v.","meaning":"暗示；意味着","formNote":"","en":"To suggest something without saying it directly.","tip":"implication n. 含义；影响","band":6.5,"artist":"Dido","title":"Thank You","lrclib":366775,"t":78.07,"videoId":"1aTeVDlf84Y"},{"word":"impress","form":"impressed","phonetic":"/ɪmˈpres/","pos":"v.","meaning":"给…留下深刻印象","formNote":"impressed 为形容词：印象深刻的","en":"To make someone admire you or your work.","tip":"be impressed by/with 对…印象深刻","band":6,"artist":"Doja Cat","title":"Say So","lrclib":1237,"t":116.9,"videoId":"uAYG46w1SCA"},{"word":"infinite","form":"infinite","phonetic":"/ˈɪnfɪnət/","pos":"adj.","meaning":"无限的；无穷的","formNote":"","en":"Without limits; extremely large in amount.","tip":"infinite patience 极大的耐心","band":6.5,"artist":"Ariana Grande","title":"positions","lrclib":145672,"t":40.99,"videoId":"xuOOAQoDKN0"},{"word":"influence","form":"influence","phonetic":"/ˈɪnfluəns/","pos":"n.","meaning":"影响；影响力","formNote":"","en":"The power to affect people or things.","tip":"have an influence on 对…有影响","band":5.5,"artist":"Billie Eilish","title":"Happier Than Ever","lrclib":348677,"t":152.92000000000002,"videoId":"YEbz2Qt3vec"},{"word":"inspire","form":"inspire","phonetic":"/ɪnˈspaɪə/","pos":"v.","meaning":"激励；启发","formNote":"","en":"To give someone the desire or ideas to do something.","tip":"inspire sb to do；inspiration n. 灵感","band":6,"artist":"Kygo","title":"Firestone","lrclib":37077948,"t":42.31,"videoId":"4rZ6p-W0h8Q"},{"word":"intention","form":"intention","phonetic":"/ɪnˈtenʃn/","pos":"n.","meaning":"意图；打算","formNote":"","en":"Something you plan or mean to do.","tip":"have no intention of doing 无意做…","band":6,"artist":"Ed Sheeran","title":"Bad Habits","lrclib":1003364,"t":88.55,"videoId":"HeOpRzcqKrE"},{"word":"interrupt","form":"interrupt","phonetic":"/ˌɪntəˈrʌpt/","pos":"v.","meaning":"打断；中断","formNote":"","en":"To stop someone or something for a short time.","tip":"interrupt sb 打断某人；interruption n.","band":6,"artist":"Arctic Monkeys","title":"Do I Wanna Know?","lrclib":297034,"t":136.14,"videoId":"wdo_ATH_ITg"},{"word":"invisible","form":"invisible","phonetic":"/ɪnˈvɪzəbl/","pos":"adj.","meaning":"看不见的；无形的","formNote":"","en":"Impossible to see.","tip":"invisible to the naked eye 肉眼看不见","band":6,"artist":"Travis","title":"Why Does It Always Rain on Me?","lrclib":1669793,"t":84.6,"videoId":"sGBqjwh9_qc"},{"word":"legacy","form":"legacy","phonetic":"/ˈleɡəsi/","pos":"n.","meaning":"遗产；遗留影响","formNote":"","en":"Something passed on from the past.","tip":"leave a legacy 留下遗产/影响","band":7,"artist":"Panic! At The Disco","title":"High Hopes","lrclib":1006730,"t":38.07,"videoId":"n3kDc9M2kqE"},{"word":"literal","form":"literally","phonetic":"/ˈlɪtərəl/","pos":"adj.","meaning":"字面的；照字面的","formNote":"literally 为副词：字面上；简直","en":"Using the basic, exact meaning of a word.","tip":"literal meaning 字面意思","band":7,"artist":"Twenty One Pilots","title":"Ride","lrclib":380864,"t":75.23,"videoId":"UprcpdwuwCg"},{"word":"magnificent","form":"magnificent","phonetic":"/mæɡˈnɪfɪsnt/","pos":"adj.","meaning":"壮丽的；宏伟的","formNote":"","en":"Extremely beautiful and impressive.","tip":"a magnificent view 壮丽的景色","band":6.5,"artist":"Bon Iver","title":"Holocene","lrclib":27141,"t":77.71000000000001,"videoId":"MjxA25Tj1Ks"},{"word":"manipulate","form":"manipulate","phonetic":"/məˈnɪpjuleɪt/","pos":"v.","meaning":"操纵；控制","formNote":"","en":"To control someone or something unfairly or skilfully.","tip":"manipulate public opinion 操纵舆论","band":7,"artist":"Shawn Mendes","title":"There's Nothing Holdin' Me Back","lrclib":1439,"t":50.79,"videoId":"NLFGOOKGfHA"},{"word":"mature","form":"mature","phonetic":"/məˈtʃʊə/","pos":"adj.","meaning":"成熟的","formNote":"","en":"Fully grown or behaving like a sensible adult.","tip":"mature attitude 成熟的态度；maturity n.","band":6,"artist":"SZA","title":"Kill Bill","lrclib":965677,"t":20.86,"videoId":"SQnc1QibapQ"},{"word":"mission","form":"mission","phonetic":"/ˈmɪʃn/","pos":"n.","meaning":"使命；任务","formNote":"","en":"An important task or purpose.","tip":"on a mission to do 肩负…的使命","band":6,"artist":"Eagles","title":"Hotel California","lrclib":395772,"t":81.82,"videoId":"dLl4PZtxia8"},{"word":"moral","form":"morals","phonetic":"/ˈmɒrəl/","pos":"adj.","meaning":"道德的；道德上的","formNote":"morals 为名词复数：道德准则；品行","en":"Relating to principles of right and wrong.","tip":"moral obligation 道德义务","band":6.5,"artist":"Duffy","title":"Mercy","lrclib":1009213,"t":35,"videoId":"rOu4wwI0xF8"},{"word":"observe","form":"observe","phonetic":"/əbˈzɜːv/","pos":"v.","meaning":"观察；遵守","formNote":"","en":"To watch carefully; to obey a rule or custom.","tip":"observe the rules 遵守规则；observation n.","band":6,"artist":"Backstreet Boys","title":"Show Me the Meaning of Being Lonely","lrclib":516036,"t":80.45,"videoId":"sA4_O0jXkjo"},{"word":"obstacle","form":"obstacle","phonetic":"/ˈɒbstəkl/","pos":"n.","meaning":"障碍；阻碍","formNote":"","en":"Something that blocks your way or progress.","tip":"overcome an obstacle 克服障碍","band":6,"artist":"Avicii","title":"Waiting For Love","lrclib":517753,"t":14.49,"videoId":"cHHLHGNpCSA"},{"word":"overwhelm","form":"overwhelmed","phonetic":"/ˌəʊvəˈwelm/","pos":"v.","meaning":"压倒；使不知所措","formNote":"overwhelmed 为形容词：不知所措的；被压垮的","en":"To affect someone too strongly to cope.","tip":"overwhelming majority 压倒性多数","band":6.5,"artist":"Alanis Morissette","title":"Hand in My Pocket","lrclib":196455,"t":23.39,"videoId":"CUjIY_XxF1g"},{"word":"panic","form":"panic","phonetic":"/ˈpænɪk/","pos":"n.","meaning":"恐慌；惊慌","formNote":"","en":"Sudden strong fear that stops clear thinking.","tip":"in a panic 惊慌失措；panic buying 抢购","band":5.5,"artist":"Imagine Dragons","title":"Enemy","lrclib":986697,"t":130.61,"videoId":"IOrbP1OqNsg"},{"word":"peculiar","form":"peculiar","phonetic":"/pɪˈkjuːliə/","pos":"adj.","meaning":"奇怪的；特有的","formNote":"","en":"Strange or unusual; belonging to one group only.","tip":"be peculiar to 为…所特有","band":7,"artist":"David Bowie","title":"Space Oddity","lrclib":36944057,"t":118.21000000000001,"videoId":"9_M3uw29U1U"},{"word":"pity","form":"pity","phonetic":"/ˈpɪti/","pos":"n.","meaning":"怜悯；遗憾","formNote":"","en":"Sadness for someone else's trouble; a regrettable fact.","tip":"It's a pity that… 遗憾的是…","band":5.5,"artist":"Billie Eilish","title":"Bad Guy","lrclib":273886,"t":98.96000000000001,"videoId":"2pnXjQCegVc"},{"word":"plead","form":"plead","phonetic":"/pliːd/","pos":"v.","meaning":"恳求；辩护","formNote":"","en":"To ask for something urgently and emotionally.","tip":"plead with sb 恳求某人；plead guilty 认罪","band":7,"artist":"Coldplay","title":"Clocks","lrclib":13450,"t":41.49,"videoId":"PFW2uSCZ0uE"},{"word":"pose","form":"pose","phonetic":"/pəʊz/","pos":"v.","meaning":"造成；提出","formNote":"","en":"To cause a problem; to ask a question.","tip":"pose a threat to 对…构成威胁","band":6.5,"artist":"Bastille","title":"Pompeii","lrclib":699778,"t":79.53,"videoId":"ilLEuwH4hws"},{"word":"possess","form":"possess","phonetic":"/pəˈzes/","pos":"v.","meaning":"拥有；具有","formNote":"","en":"To have or own something.","tip":"possess skills 具备技能；possession n.","band":6.5,"artist":"Whitney Houston","title":"Greatest Love of All","lrclib":767357,"t":24.18,"videoId":"IYzlVDlE72w"},{"word":"precious","form":"precious","phonetic":"/ˈpreʃəs/","pos":"adj.","meaning":"珍贵的；宝贵的","formNote":"","en":"Very valuable, loved, or important.","tip":"precious time 宝贵的时间","band":6,"artist":"Vanessa Carlton","title":"A Thousand Miles","lrclib":315789,"t":79,"videoId":"TJC1xEi3oNw"},{"word":"pressure","form":"pressure","phonetic":"/ˈpreʃə/","pos":"n.","meaning":"压力；压迫","formNote":"","en":"Stress caused by demands or expectations.","tip":"peer pressure 同辈压力；under pressure","band":5.5,"artist":"Linkin Park","title":"Numb","lrclib":14348,"t":34.09,"videoId":"vuFdq_jWeko"},{"word":"recall","form":"recall","phonetic":"/rɪˈkɔːl/","pos":"v.","meaning":"回想；召回","formNote":"","en":"To remember something from the past.","tip":"recall doing sth 回想起做过某事","band":6.5,"artist":"Benson Boone","title":"Beautiful Things","lrclib":5559814,"t":13.35,"videoId":"HU08BcK5SUY"},{"word":"rely","form":"rely","phonetic":"/rɪˈlaɪ/","pos":"v.","meaning":"依赖；信赖","formNote":"","en":"To depend on someone or something.","tip":"rely on sb/sth 依赖；reliable adj. 可靠的","band":5.5,"artist":"Keane","title":"Somewhere Only We Know","lrclib":15864,"t":52.24,"videoId":"Oextk-If8HQ"},{"word":"revenge","form":"revenge","phonetic":"/rɪˈvendʒ/","pos":"n.","meaning":"报复；复仇","formNote":"","en":"Harm done to someone who has harmed you.","tip":"take revenge on sb 向某人报复","band":6.5,"artist":"Lady Gaga","title":"Bad Romance","lrclib":40904,"t":74.06,"videoId":"NlK9u6a69Dg"},{"word":"reverse","form":"reverse","phonetic":"/rɪˈvɜːs/","pos":"v.","meaning":"逆转；颠倒","formNote":"","en":"To change something to its opposite.","tip":"reverse the trend 扭转趋势","band":6.5,"artist":"Coldplay","title":"Fix You","lrclib":13635,"t":33.32,"videoId":"k4V3Mo61fJM"},{"word":"rival","form":"rival","phonetic":"/ˈraɪvl/","pos":"n.","meaning":"对手；竞争者","formNote":"","en":"A person or group competing with another.","tip":"a fierce rival 强劲对手；rivalry n.","band":6.5,"artist":"Survivor","title":"Eye of the Tiger","lrclib":56751,"t":88.19,"videoId":"ktQ8FbzniLU"},{"word":"savage","form":"savage","phonetic":"/ˈsævɪdʒ/","pos":"adj.","meaning":"野蛮的；凶猛的","formNote":"","en":"Extremely violent, cruel or fierce.","tip":"savage attack 猛烈抨击/袭击","band":7,"artist":"Ariana Grande","title":"7 rings","lrclib":84810,"t":31.19,"videoId":"25p-EOVFHwU"},{"word":"shallow","form":"shallow","phonetic":"/ˈʃæləʊ/","pos":"adj.","meaning":"浅的；肤浅的","formNote":"","en":"Not deep; not showing serious thought.","tip":"shallow water 浅水；a shallow person","band":6.5,"artist":"Lady Gaga","title":"Shallow","lrclib":1017788,"t":119.8,"videoId":"4snkdlssd98"},{"word":"sorrow","form":"sorrow","phonetic":"/ˈsɒrəʊ/","pos":"n.","meaning":"悲伤；悲痛","formNote":"","en":"A feeling of deep sadness.","tip":"express sorrow for 对…表示哀痛","band":7,"artist":"Adele","title":"Rolling in the Deep","lrclib":1213,"t":160.67000000000002,"videoId":"bDtjO-R0QSo"},{"word":"steady","form":"steady","phonetic":"/ˈstedi/","pos":"adj.","meaning":"稳定的；平稳的","formNote":"","en":"Firm, regular, and not changing suddenly.","tip":"a steady increase 稳步增长","band":6,"artist":"Lukas Graham","title":"7 Years","lrclib":986343,"t":48.79,"videoId":"0Iaua2rO5Zk"},{"word":"subtle","form":"subtle","phonetic":"/ˈsʌtl/","pos":"adj.","meaning":"微妙的；细微的","formNote":"","en":"Not obvious; small but important.","tip":"a subtle difference 细微的差别","band":7,"artist":"fun.","title":"We Are Young","lrclib":1019260,"t":32.51,"videoId":"nAzRHjreg6w"},{"word":"surrender","form":"surrender","phonetic":"/səˈrendə/","pos":"v.","meaning":"投降；放弃","formNote":"","en":"To stop fighting and accept defeat.","tip":"surrender to sb 向某人投降","band":7,"artist":"Hugh Jackman","title":"The Greatest Show","lrclib":1010583,"t":87.96000000000001,"videoId":"NyVYXRD1Ans"},{"word":"suspect","form":"suspect","phonetic":"/səˈspekt/","pos":"v.","meaning":"怀疑；猜想","formNote":"","en":"To think something is true, especially something bad.","tip":"suspect sb of sth 怀疑某人做了…","band":6,"artist":"Sting","title":"Shape of My Heart","lrclib":610983,"t":30.18,"videoId":"NlwIDxCjL-8"},{"word":"swallow","form":"swallow","phonetic":"/ˈswɒləʊ/","pos":"v.","meaning":"吞咽；轻信","formNote":"","en":"To move food or drink down your throat.","tip":"swallow one's pride 放下面子","band":6,"artist":"Jung Kook","title":"Seven","lrclib":3852531,"t":134.89,"videoId":"Vs64cZbeY88"},{"word":"temporary","form":"temporary","phonetic":"/ˈtemprəri/","pos":"adj.","meaning":"临时的；暂时的","formNote":"","en":"Lasting for only a limited time.","tip":"temporary job 临时工作；反义 permanent","band":5.5,"artist":"Imagine Dragons","title":"Birds","lrclib":943218,"t":40.16,"videoId":"fQ-BPdkoSMw"},{"word":"thrive","form":"thrive","phonetic":"/θraɪv/","pos":"v.","meaning":"繁荣；茁壮成长","formNote":"","en":"To grow or develop successfully.","tip":"thrive on sth 以…为动力而成长","band":7,"artist":"Katy Perry","title":"Rise","lrclib":955609,"t":9,"videoId":"WDCQms9uZJA"},{"word":"tradition","form":"tradition","phonetic":"/trəˈdɪʃn/","pos":"n.","meaning":"传统；惯例","formNote":"","en":"A custom passed down over generations.","tip":"break with tradition 打破传统","band":5.5,"artist":"Natasha Bedingfield","title":"Unwritten","lrclib":91775,"t":80.35,"videoId":"iKejQrGq04w"},{"word":"tragedy","form":"tragedy","phonetic":"/ˈtrædʒədi/","pos":"n.","meaning":"悲剧；惨事","formNote":"","en":"A very sad event or situation.","tip":"a personal tragedy 个人悲剧；tragic adj.","band":6,"artist":"Zedd","title":"Clarity","lrclib":943376,"t":54.57,"videoId":"odMLuMl7s4Q"},{"word":"trigger","form":"trigger","phonetic":"/ˈtrɪɡə/","pos":"v.","meaning":"引发；触发","formNote":"","en":"To cause something to start happening.","tip":"trigger a debate 引发争论","band":6.5,"artist":"Foster the People","title":"Pumped Up Kicks","lrclib":887132,"t":111.93,"videoId":"p7mW0mtjAA4"},{"word":"urge","form":"urge","phonetic":"/ɜːdʒ/","pos":"v.","meaning":"敦促；力劝","formNote":"","en":"To strongly encourage someone to do something.","tip":"urge sb to do sth 敦促某人做…","band":6.5,"artist":"Third Eye Blind","title":"Semi-Charmed Life","lrclib":379710,"t":147.11,"videoId":"KR5pPlE4rqc"},{"word":"venture","form":"venture","phonetic":"/ˈventʃə/","pos":"n.","meaning":"冒险事业；风险投资","formNote":"","en":"A new, risky business or activity.","tip":"joint venture 合资企业；venture into 冒险进入","band":6.5,"artist":"Avicii","title":"The Nights","lrclib":220,"t":85.96000000000001,"videoId":"XmIgg9De9hY"},{"word":"violent","form":"violence","phonetic":"/ˈvaɪələnt/","pos":"adj.","meaning":"暴力的；猛烈的","formNote":"violence 为名词：暴力；猛烈","en":"Using force to hurt or damage.","tip":"violent crime 暴力犯罪","band":6,"artist":"The Verve","title":"Bitter Sweet Symphony","lrclib":124739,"t":280.44,"videoId":"JnRw8bXVbPI"},{"word":"vital","form":"vital","phonetic":"/ˈvaɪtl/","pos":"adj.","meaning":"至关重要的","formNote":"","en":"Extremely important or necessary.","tip":"be vital to/for 对…至关重要","band":6,"artist":"Green Day","title":"Boulevard of Broken Dreams","lrclib":750470,"t":110.05,"videoId":"hBvJyi3fbtA"},{"word":"vulnerable","form":"vulnerable","phonetic":"/ˈvʌlnərəbl/","pos":"adj.","meaning":"脆弱的；易受伤害的","formNote":"","en":"Easily hurt or harmed.","tip":"be vulnerable to 易受…影响","band":7,"artist":"Justin Bieber","title":"Love Yourself","lrclib":543485,"t":183.13,"videoId":"pb4hWWMlFYg"},{"word":"warrior","form":"warriors","phonetic":"/ˈwɒriə/","pos":"n.","meaning":"战士；勇士","formNote":"warriors 为名词复数","en":"A brave, experienced fighter.","tip":"a warrior spirit 斗士精神","band":6.5,"artist":"Keala Settle","title":"This Is Me","lrclib":1010591,"t":104.07,"videoId":"VsJzY12lZos"},{"word":"wisdom","form":"wisdom","phonetic":"/ˈwɪzdəm/","pos":"n.","meaning":"智慧；明智","formNote":"","en":"Good judgement from knowledge and experience.","tip":"conventional wisdom 普遍看法","band":6,"artist":"The Beatles","title":"Let It Be","lrclib":14071,"t":19.98,"videoId":"atLK2RIZzWk"},{"word":"worship","form":"worshipped","phonetic":"/ˈwɜːʃɪp/","pos":"v.","meaning":"崇拜；敬奉","formNote":"worshipped 为过去式/过去分词（英式双写 p）","en":"To show deep respect and love for a god or person.","tip":"worship sb as a hero 把某人奉为英雄","band":7,"artist":"Hozier","title":"Take Me to Church","lrclib":1398,"t":9.16,"videoId":"RzZK3XIVLfM"}];
+</script>
+<script>
+(() => {
+const DATA = window.SONG_WORDS;
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+};
+const mq = matchMedia('(max-width: 899px)');
+const isMobile = () => mq.matches;
+const pad = n => String(n).padStart(3, '0');
+const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+
+const state = { band: '', cur: 0, loop: false, auto: store.get('stw.auto', false), done: new Set(store.get('stw.done', [])), started: false };
+
+/* ---------- lyrics (fetched at runtime; only the lines around the word are kept) ---------- */
+const lyr = new Map();
+function parseLrc(s) {
+  return s.split('\n').map(l => { const m = l.match(/^\[(\d+):(\d+(?:\.\d+)?)\](.*)$/); return m && { t: +m[1] * 60 + +m[2], x: m[3].trim() }; }).filter(Boolean);
+}
+function loadLyrics(i) {
+  if (lyr.has(i)) return lyr.get(i);
+  const e = DATA[i];
+  const p = fetch(`https://lrclib.net/api/get/${e.lrclib}`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(d => {
+    const all = parseLrc(d.syncedLyrics || '');
+    let k = all.findIndex(l => Math.abs(l.t - e.t) < .05);
+    if (k < 0) k = all.findIndex(l => l.t >= e.t - .5);
+    const from = Math.max(0, all[k - 1] && e.t - all[k - 1].t < 9 ? k - 1 : k);
+    const to = Math.min(all.length - 1, k + 2);
+    const lines = [];
+    for (let j = from; j <= to; j++) if (all[j].x) lines.push({ t: all[j].t, end: all[j + 1]?.t ?? all[j].t + 4, x: all[j].x, target: j === k });
+    const start = Math.max(0, lines[0].t - 1.2);
+    let end = lines.at(-1).end;
+    if (end - start > 20) end = start + 20;
+    if (end - e.t < 5) end = e.t + 6;
+    return { lines, start, end };
+  });
+  lyr.set(i, p);
+  p.catch(() => lyr.delete(i));
+  return p;
+}
+const re = f => new RegExp(`\\b(${f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})\\b`, 'i');
+function lineHTML(L, form) {
+  const words = L.x.split(/\s+/);
+  const r = L.target ? re(form) : null;
+  return words.map(w => {
+    if (r && r.test(w)) return `<span class="lw tw">${esc(w)}</span>`;
+    return `<span class="lw">${esc(w)}</span>`;
+  }).join(' ');
+}
+async function fillLyrics(i, root) {
+  const box = root.querySelector('.lyrics-in');
+  if (!box || box.dataset.ok) return;
+  try {
+    const L = await loadLyrics(i);
+    box.innerHTML = L.lines.map(l => `<p class="ln">${lineHTML(l, DATA[i].form)}</p>`).join('');
+    box.dataset.ok = 1;
+  } catch {
+    box.innerHTML = `<p class="lyr-msg">歌词加载失败，请检查网络后点播放重试。</p>`;
+  }
+}
+
+/* ---------- rendering ---------- */
+const noteIco = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 18.5A2.5 2.5 0 1 1 6.5 16c.53 0 1.02.16 1.5.44V5l11-2v12.5A2.5 2.5 0 1 1 16.5 13c.53 0 1.02.16 1.5.44V7.4l-7 1.27v9.83z"/></svg>';
+const spk = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+const thumb = e => `https://i.ytimg.com/vi/${e.videoId}/mqdefault.jpg`;
+function stageHTML(i) {
+  const e = DATA[i];
+  return `<article class="stage" data-i="${i}">
+    <div class="st-top"><span class="pill band">IELTS ${esc(e.band)}</span><span class="pill">${esc(e.pos)}</span><span class="no">#${pad(i + 1)}</span></div>
+    <h2 class="st-word">${esc(e.word)}</h2>
+    <div class="st-row"><button class="st-ipa" type="button" data-say="${esc(e.word)}" aria-label="朗读 ${esc(e.word)}">${spk}<span>${esc(e.phonetic)}</span></button><p class="st-mean">${esc(e.meaning)}</p></div>
+    <p class="st-en">${esc(e.en)}</p>
+    <div class="lyrics"><div class="lyrics-in"><p class="lyr-msg">正在加载歌词…</p></div></div>
+    <div class="st-song"><img class="mini" src="${thumb(e)}" alt="" loading="lazy"><div><b>${esc(e.title)}</b><span>${esc(e.artist)}</span></div></div>
+    ${e.formNote ? `<p class="st-note">${esc(e.formNote)}</p>` : ''}
+    ${e.tip ? `<div class="st-tip"><b>搭配</b>${esc(e.tip)}</div>` : ''}
+  </article>`;
+}
+const grid = $('#grid'), carousel = $('#carousel'), deskStage = $('#deskStage');
+function renderGrid() {
+  const q = $('#q').value.trim().toLowerCase(), band = state.band;
+  let n = 0;
+  grid.innerHTML = DATA.map((e, i) => {
+    const b = +e.band;
+    if (band === '5.5' && b > 6) return '';
+    if (band === '6.5' && b !== 6.5) return '';
+    if (band === '7' && b < 7) return '';
+    if (q && ![e.word, e.meaning, e.title.toLowerCase(), e.artist.toLowerCase()].some(s => s.includes(q))) return '';
+    n++;
+    return `<button type="button" class="card" data-i="${i}">
+      <span class="disc"><img src="${thumb(e)}" alt="" loading="lazy"></span>
+      <span class="no">#${pad(i + 1)}</span><span class="w">${esc(e.word)}</span><span class="ph">${esc(e.phonetic)}</span>
+      <span class="mn">${esc(e.pos)} ${esc(e.meaning)}</span><span class="sg"><b>${esc(e.title)}</b> · ${esc(e.artist)}</span></button>`;
+  }).join('') || '<p class="empty">没有匹配的单词</p>';
+  $('#countLine').textContent = (q || band) ? `${n} 个匹配` : `${DATA.length} 个单词 · ${new Set(DATA.map(e => e.artist)).size} 位歌手`;
+  markCards();
+}
+function markCards() {
+  grid.querySelectorAll('.card').forEach(c => {
+    const i = +c.dataset.i;
+    c.classList.toggle('on', i === state.cur);
+    c.classList.toggle('done', state.done.has(DATA[i].word));
+    c.classList.toggle('playing', i === state.cur && P.playing);
+  });
+  $('#doneCount').textContent = state.done.size;
+  $('#progFill').style.width = `${state.done.size / DATA.length * 100}%`;
+}
+
+/* ---------- YouTube player ---------- */
+let yt = null, ytReady = false, pending = null;
+window.onYouTubeIframeAPIReady = () => {
+  yt = new YT.Player('yt', {
+    host: 'https://www.youtube-nocookie.com',
+    playerVars: { playsinline: 1, rel: 0, modestbranding: 1, controls: 0, disablekb: 1, iv_load_policy: 3, fs: 0 },
+    events: {
+      onReady: () => { ytReady = true; if (pending) { const p = pending; pending = null; p(); } else cue(state.cur); },
+      onStateChange: ev => { if (ev.data === YT.PlayerState.PLAYING) P.playing = true; if (ev.data === YT.PlayerState.PAUSED) P.playing = false; updateBtn(); },
+      onError: () => showErr()
+    }
+  });
+};
+const tag = document.createElement('script'); tag.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(tag);
+function whenReady(fn) { if (ytReady) fn(); else pending = fn; }
+async function cue(i) {
+  const L = await loadLyrics(i).catch(() => null);
+  whenReady(() => yt.cueVideoById({ videoId: DATA[i].videoId, startSeconds: L ? L.start : Math.max(0, DATA[i].t - 3) }));
+}
+function showErr() {
+  const e = DATA[state.cur];
+  const box = P.root?.querySelector('.lyrics-in');
+  if (box) box.insertAdjacentHTML('beforeend', `<p class="lyr-msg">这个视频无法在此播放，<a href="https://www.youtube.com/watch?v=${e.videoId}&t=${Math.floor(e.t)}s" target="_blank" rel="noopener">去 YouTube 听这一段</a>。</p>`);
+}
+
+/* ---------- player / karaoke ---------- */
+const P = { i: -1, root: null, L: null, raf: 0, playing: false, curLine: -1, timer: 0, token: 0 };
+function currentRoot() { return isMobile() ? carousel.children[state.cur]?.querySelector('.stage') : deskStage.querySelector('.stage'); }
+function resetVisual(root) {
+  if (!root) return;
+  root.classList.remove('live');
+  root.querySelectorAll('.ln').forEach(l => l.classList.remove('cur', 'past'));
+  root.querySelectorAll('.lw').forEach(w => w.style.removeProperty('--p'));
+  const inner = root.querySelector('.lyrics-in'); if (inner) inner.style.transform = '';
+}
+function stop() {
+  P.token++;
+  clearTimeout(P.timer); cancelAnimationFrame(P.raf);
+  if (ytReady && P.playing) yt.pauseVideo();
+  P.playing = false; P.curLine = -1;
+  resetVisual(P.root);
+  $('#clipTag').hidden = true;
+  updateBtn();
+}
+async function play(i) {
+  stop();
+  const token = P.token;
+  P.i = i; P.root = currentRoot();
+  await fillLyrics(i, P.root);
+  let L; try { L = await loadLyrics(i); } catch { return; }
+  if (token !== P.token) return;
+  P.L = L;
+  P.lineEls = [...P.root.querySelectorAll('.ln')];
+  P.wordEls = P.lineEls.map(l => [...l.querySelectorAll('.lw')]);
+  P.box = P.root.querySelector('.lyrics'); P.inner = P.root.querySelector('.lyrics-in');
+  P.root.classList.add('live');
+  const tagEl = $('#clipTag'); tagEl.textContent = `片段 ${fmt(L.start)}–${fmt(L.end)}`; tagEl.hidden = false;
+  whenReady(() => {
+    if (token !== P.token) return;
+    P.armed = false;
+    yt.loadVideoById({ videoId: DATA[i].videoId, startSeconds: L.start, endSeconds: L.end + .6 });
+    P.playing = true; updateBtn();
+    const w = DATA[i].word; if (!state.done.has(w)) { state.done.add(w); store.set('stw.done', [...state.done]); markCards(); }
+    P.raf = requestAnimationFrame(frame);
+  });
+  preload(i + 1); preload(i + 2);
+}
+function preload(i) { if (i < DATA.length) loadLyrics(i).catch(() => {}); }
+function frame() {
+  const t = yt.getCurrentTime ? yt.getCurrentTime() : 0;
+  const st = yt.getPlayerState?.();
+  // Right after loadVideoById the player can still report the previous video's time; wait until it is really in this clip.
+  if (!P.armed) {
+    if (st === YT.PlayerState.PLAYING && t >= P.L.start - 2 && t <= P.L.end) P.armed = true;
+    else { P.raf = requestAnimationFrame(frame); return; }
+  }
+  if (t >= P.L.start - .5) render(t);
+  if (t >= P.L.end || st === YT.PlayerState.ENDED) return ended();
+  P.raf = requestAnimationFrame(frame);
+}
+function render(t) {
+  const L = P.L.lines;
+  let cur = -1; for (let k = 0; k < L.length; k++) if (t >= L[k].t - .08) cur = k;
+  if (cur !== P.curLine) {
+    P.lineEls.forEach((el, k) => { el.classList.toggle('cur', k === cur); el.classList.toggle('past', k < cur); });
+    if (P.curLine >= 0) P.wordEls[P.curLine]?.forEach(w => w.style.removeProperty('--p'));
+    P.curLine = cur;
+    const el = P.lineEls[Math.max(0, cur)];
+    if (el && P.inner) {
+      const top = Math.max(0, el.offsetTop - (P.box.clientHeight - el.offsetHeight) / 2);
+      P.inner.style.transform = `translateY(${-top}px)`;
+    }
+  }
+  if (cur >= 0) {
+    // LRC gives line timing only; spread the fill across the words, weighted by length.
+    const line = L[cur], words = P.wordEls[cur] || [];
+    const span = Math.min(line.end - line.t, .34 * line.x.length / 3 + .6) * .92;
+    const total = words.reduce((a, w) => a + w.textContent.length + 1, 0);
+    let acc = 0;
+    words.forEach(w => {
+      const s = line.t + span * acc / total; acc += w.textContent.length + 1;
+      const e = line.t + span * acc / total;
+      const p = t <= s ? 0 : t >= e ? 1 : (t - s) / (e - s);
+      if (w._p !== p) { w._p = p; w.style.setProperty('--p', p.toFixed(3)); if (w.classList.contains('tw')) w.classList.toggle('hit', p > 0); }
+    });
+  }
+  $('#time').textContent = `${fmt(Math.max(0, t - P.L.start))} / ${fmt(P.L.end - P.L.start)}`;
+}
+function ended() {
+  yt.pauseVideo(); P.playing = false; updateBtn();
+  P.lineEls.forEach(l => { l.classList.remove('cur'); l.classList.add('past'); });
+  const token = P.token;
+  P.timer = setTimeout(() => {
+    if (token !== P.token) return;
+    if (state.loop) play(P.i);
+    else if (state.auto) go(state.cur + 1, true);
+    else { resetVisual(P.root); }
+  }, 900);
+}
+function updateBtn() {
+  const on = P.playing;
+  $('#icoPlay').toggleAttribute('hidden', on); $('#icoPause').toggleAttribute('hidden', !on);
+  $('#play').setAttribute('aria-label', on ? '暂停' : '播放');
+  document.body.classList.toggle('is-playing', on);
+  markCards();
+}
+function toggle() {
+  if (P.i !== state.cur || !P.L) return play(state.cur);
+  if (P.playing) { yt.pauseVideo(); cancelAnimationFrame(P.raf); P.playing = false; }
+  else if (P.root.classList.contains('live') && yt.getCurrentTime() < P.L.end - .2) { yt.playVideo(); P.playing = true; P.raf = requestAnimationFrame(frame); }
+  else return play(state.cur);
+  updateBtn();
+}
+
+/* ---------- navigation ---------- */
+let suppressScroll = false, scrollT = 0;
+let artFlip = false;
+function setArt(i) {
+  const [on, off] = artFlip ? [$('#artA'), $('#artB')] : [$('#artB'), $('#artA')];
+  artFlip = !artFlip;
+  on.style.backgroundImage = `url("https://i.ytimg.com/vi/${DATA[i].videoId}/hqdefault.jpg")`;
+  on.classList.add('show'); off.classList.remove('show');
+}
+function go(i, autoplay) {
+  i = (i + DATA.length) % DATA.length;
+  if (i !== state.cur || !artFlip) setArt(i);
+  stop();
+  state.cur = i; P.i = -1; P.L = null;
+  if (isMobile()) {
+    const slide = carousel.children[i];
+    if (slide && Math.abs(carousel.scrollLeft - slide.offsetLeft) > 2) { suppressScroll = true; carousel.scrollTo({ left: slide.offsetLeft, behavior: 'auto' }); setTimeout(() => suppressScroll = false, 80); }
+  } else deskStage.innerHTML = stageHTML(i);
+  P.root = currentRoot();
+  fillLyrics(i, P.root);
+  if (isMobile()) { [i - 1, i + 1].forEach(j => { const s = carousel.children[j]?.querySelector('.stage'); if (s) fillLyrics(j, s); }); }
+  markCards();
+  loadLyrics(i).then(L => { if (state.cur === i) $('#time').textContent = `0:00 / ${fmt(L.end - L.start)}`; }).catch(() => {});
+  if (autoplay) play(i); else cue(i);
+}
+function buildCarousel() {
+  if (carousel.childElementCount) return;
+  carousel.innerHTML = DATA.map((_, i) => `<div class="slide">${stageHTML(i)}</div>`).join('');
+}
+carousel.addEventListener('scroll', () => {
+  if (suppressScroll) return;
+  clearTimeout(scrollT);
+  scrollT = setTimeout(settle, 'onscrollend' in window ? 400 : 140);
+}, { passive: true });
+carousel.addEventListener('scrollend', () => { if (!suppressScroll) { clearTimeout(scrollT); settle(); } });
+function settle() {
+  const i = Math.round(carousel.scrollLeft / carousel.clientWidth);
+  if (i === state.cur || i < 0 || i >= DATA.length) return;
+  go(i, state.started);
+}
+
+/* ---------- wiring ---------- */
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-say]'); if (!b) return;
+  try { const u = new SpeechSynthesisUtterance(b.dataset.say); u.lang = 'en-GB'; u.rate = .85; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch {}
+});
+grid.addEventListener('click', e => {
+  const c = e.target.closest('.card'); if (!c) return;
+  state.started = true; $('#start').hidden = true;
+  $('#browser').classList.remove('open');
+  go(+c.dataset.i, true);
+});
+$('#q').addEventListener('input', renderGrid);
+$('#bandChips').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  state.band = b.dataset.b;
+  $('#bandChips').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  renderGrid();
+});
+$('#play').addEventListener('click', () => { state.started = true; $('#start').hidden = true; toggle(); });
+$('#prev').addEventListener('click', () => { state.started = true; go(state.cur - 1, true); });
+$('#next').addEventListener('click', () => { state.started = true; go(state.cur + 1, true); });
+$('#replay').addEventListener('click', () => { state.started = true; play(state.cur); });
+const tog = (id, key) => { const b = $(id); b.setAttribute('aria-pressed', !!state[key]); b.addEventListener('click', () => { state[key] = !state[key]; b.setAttribute('aria-pressed', state[key]); if (key === 'auto') store.set('stw.auto', state.auto); }); };
+tog('#loop', 'loop'); tog('#auto', 'auto');
+$('#startBtn').addEventListener('click', () => { state.started = true; $('#start').hidden = true; play(state.cur); });
+$('#openList').addEventListener('click', () => { $('#browser').classList.add('open'); grid.querySelector('.card.on')?.scrollIntoView({ block: 'center' }); });
+$('#closeList').addEventListener('click', () => $('#browser').classList.remove('open'));
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input,select,textarea')) return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); state.started = true; go(state.cur + 1, true); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); state.started = true; go(state.cur - 1, true); }
+  else if (e.key === ' ') { e.preventDefault(); state.started = true; toggle(); }
+});
+function applyMode() {
+  stop();
+  if (isMobile()) { buildCarousel(); requestAnimationFrame(() => go(state.cur, false)); }
+  else { $('#start').hidden = true; go(state.cur, false); }
+}
+mq.addEventListener('change', applyMode);
+
+$('#totalCount').textContent = DATA.length;
+renderGrid();
+applyMode();
+})();
+</script>
+</body>
+</html>
