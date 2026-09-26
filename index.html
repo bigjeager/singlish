@@ -208,7 +208,9 @@ body.is-playing .deck-cd{animation-play-state:running}
   .top{padding:10px 16px;gap:10px;flex:none}
   .logo h1{font-size:21px}
   .tagline,.prog-bar{display:none}
-  .btn-list{display:inline-block}
+  .btn-list{display:inline-block;flex:none;white-space:nowrap}
+  .top .logo,.full-pill{flex:none}
+  .btn-fav{width:34px;height:34px;padding:0;color:var(--amber);font-size:15px;line-height:1}
   /* z-index:auto so the fixed word-list panel (z 40) can sit above the header (z 20) */
   .app{display:flex;flex-direction:column;padding:0;flex:1;min-height:0;min-width:0;gap:0;width:100%;max-width:100vw;z-index:auto}
   .aside{position:static;display:contents}
@@ -331,6 +333,7 @@ body.is-playing .deck-cd{animation-play-state:running}
 .sheet-hint{line-height:1.7}
 .sheet-hint.strong{font-size:15px;font-weight:700;color:var(--ink)}
 .sheet-hint small{font-size:12px;font-weight:500;color:var(--muted)}
+@media (max-width: 400px){ .prog-word{display:none} }
 </style>
 </head>
 <body>
@@ -340,7 +343,8 @@ body.is-playing .deck-cd{animation-play-state:running}
   <div class="logo"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><h1>Sing<span>lish</span></h1></div><button type="button" class="full-pill" id="openFull" data-umami-event="full-pill" data-umami-event-from="button">完整版</button>
   <p class="tagline">听歌记单词 · 每个雅思词都藏在一段流行歌里</p>
   <div class="grow"></div>
-  <div class="prog"><div class="prog-bar"><i id="progFill"></i></div><span><b id="doneCount">0</b> / <span id="totalCount">100</span> 已唱</span></div>
+  <div class="prog"><div class="prog-bar"><i id="progFill"></i></div><span><b id="doneCount">0</b> / <span id="totalCount">100</span><span class="prog-word"> 已唱</span></span></div>
+  <button class="btn-list btn-fav" id="openFav" type="button" aria-label="我的收藏" title="我的收藏">★</button>
   <button class="btn-list" id="openList" type="button">词表</button>
 </header>
 
@@ -1085,11 +1089,14 @@ const tog = (id, key) => { const b = $(id); b.setAttribute('aria-pressed', !!sta
 tog('#shuffle', 'shuffle'); tog('#loop', 'loop');
 // the whole gate is tappable, not just the button
 $('#start').addEventListener('click', () => { prime(state.cur); state.started = true; $('#start').hidden = true; play(state.cur); });
-$('#openList').addEventListener('click', () => {
+function openList() {
   const panel = $('#browser'); panel.classList.add('open');
   const c = grid.querySelector('.card.on');   // scroll the panel itself; scrollIntoView could also move the page on iOS
   if (c) panel.scrollTop = c.offsetTop - panel.clientHeight / 2 + c.offsetHeight / 2;
-});
+}
+$('#openList').addEventListener('click', openList);
+// shortcut to 词表 → ★ 收藏 (with no favorites yet, the list stays put and shows how to add one)
+$('#openFav').addEventListener('click', () => { track('open-fav', { n: state.fav.size }); if (state.dict !== 'fav') applyDict('fav', DATA[state.cur]?.word); openList(); });
 $('#closeList').addEventListener('click', () => $('#browser').classList.remove('open'));
 document.addEventListener('keydown', e => {
   if (e.target.matches('input,select,textarea')) return;
