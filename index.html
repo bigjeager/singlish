@@ -331,7 +331,7 @@ body.is-playing .deck-cd{animation-play-state:running}
 <div class="ambient" aria-hidden="true"><i id="artA"></i><i id="artB"></i></div>
 
 <header class="top">
-  <div class="logo"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><h1>Sing<span>lish</span></h1></div><button type="button" class="full-pill" id="openFull" data-umami-event="full-pill">完整版</button>
+  <div class="logo"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><h1>Sing<span>lish</span></h1></div><button type="button" class="full-pill" id="openFull" data-umami-event="full-pill" data-umami-event-from="button">完整版</button>
   <p class="tagline">听歌记单词 · 每个雅思词都藏在一段流行歌里</p>
   <div class="grow"></div>
   <div class="prog"><div class="prog-bar"><i id="progFill"></i></div><span><b id="doneCount">0</b> / <span id="totalCount">100</span> 已唱</span></div>
@@ -822,7 +822,7 @@ const sungThisVisit = new Set();
 function maybeSurvey(i) {
   if (i < 0) return;
   sungThisVisit.add(DATA[i].word);
-  if (sungThisVisit.size >= 5 && !store.get('stw.survey', 0) && !store.get('stw.vote', null) && $('#sheet').hidden) { store.set('stw.survey', 1); $('#survey').hidden = false; }
+  if (sungThisVisit.size >= 5 && !store.get('stw.survey', 0) && !store.get('stw.vote', null) && $('#sheet').hidden) { store.set('stw.survey', 1); $('#survey').hidden = false; track('full-pill', { from: 'auto' }); }
 }
 renderWant();
 
