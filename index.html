@@ -939,7 +939,7 @@ async function makeCard(i) {
   g.textAlign = 'left'; g.font = `800 44px ${DISPLAY}`; g.fillStyle = '#F7F5FF'; g.fillText('Sing', 80, qy + 78);
   const sw = g.measureText('Sing').width, lw = g.measureText('lish').width; g.fillStyle = grad(80 + sw, 80 + sw + 80); g.fillText('lish', 80 + sw, qy + 78);
   g.fillStyle = '#F7F5FF'; g.fillText('.study', 80 + sw + lw, qy + 78);   // the wordmark doubles as the address
-  g.font = `500 24px ${BODY}`; g.fillStyle = '#8A86AA'; g.fillText('扫码听这一句', 80, qy + 122);
+  g.font = `500 24px ${BODY}`; g.fillStyle = '#8A86AA'; g.fillText('每个单词，都有一首歌', 80, qy + 122);
   return new Promise(ok => c.toBlob(ok, 'image/png'));
 }
 let shareFile = null, shareIdx = 0, shareUrl = '';
