@@ -933,7 +933,7 @@ async function makeCard(i) {
   // footer: wordmark + caption on the left, QR code to this word on the right
   const qs = 150, qx = W - 80 - qs, qy = H - 80 - qs;
   if (window.qrcode) {
-    const q = qrcode(0, 'M'); q.addData(pageUrl(i, 'sharing')); q.make();
+    const q = qrcode(0, 'M'); q.addData(pageUrl(i, 'sharing', `line${shareLine + 1}`)); q.make();
     const n = q.getModuleCount(), pad = 12, cell = (qs - pad * 2) / n;
     g.fillStyle = '#FFFFFF'; rrect(g, qx, qy, qs, qs, 16); g.fill(); g.fillStyle = '#0B0A14';
     for (let a = 0; a < n; a++) for (let b = 0; b < n; b++) if (q.isDark(a, b)) g.fillRect(Math.floor(qx + pad + b * cell), Math.floor(qy + pad + a * cell), Math.ceil(cell), Math.ceil(cell));
@@ -947,12 +947,14 @@ async function makeCard(i) {
   g.fillStyle = 'rgba(255,77,141,.12)'; rrect(g, px, py, pw, ph, ph / 2); g.fill();
   g.strokeStyle = 'rgba(255,77,141,.45)'; g.lineWidth = 2; rrect(g, px, py, pw, ph, ph / 2); g.stroke();
   g.fillStyle = '#FF9DC0'; g.textBaseline = 'middle'; g.fillText('preview', px + 14, py + ph / 2 + 1); g.textBaseline = 'alphabetic';
-  g.font = `500 24px ${BODY}`; g.fillStyle = '#8A86AA'; g.fillText('每个单词，都有一首歌', 80, qy + 122);
+  g.font = `500 24px ${BODY}`; g.fillStyle = '#8A86AA'; g.fillText(SHARE_LINES[shareLine], 80, qy + 122);
   return new Promise(ok => c.toBlob(ok, 'image/png'));
 }
-let shareFile = null, shareIdx = 0, shareUrl = '';
+let shareFile = null, shareIdx = 0, shareUrl = '', shareLine = 0;
 async function openShare(i) {
-  track('share-open', { word: DATA[i].word });
+  // one line per poster: the poster slogan, the share text and both links all use it
+  shareLine = store.get('stw.line', 0) % SHARE_LINES.length; store.set('stw.line', shareLine + 1);
+  track('share-open', { word: DATA[i].word, line: shareLine + 1 });
   shareIdx = i; shareFile = null;
   const sheet = $('#sheet'), img = $('#sheetImg');
   sheet.hidden = false; img.hidden = true; $('#sheetBusy').hidden = false;
@@ -986,7 +988,7 @@ $('#sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeS
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#sheet').hidden) closeShare(); if (e.key === 'Escape' && !$('#survey').hidden) { store.set('stw.survey', 1); closeSurvey(); } });
 $('#shareNative').addEventListener('click', async () => {
   const e = DATA[shareIdx];
-  const k = store.get('stw.line', 0) % SHARE_LINES.length; store.set('stw.line', k + 1);
+  const k = shareLine;
   track('share', { word: e.word, line: k + 1 });
   try { await navigator.share({ files: [shareFile], title: `Singlish · ${e.word}`, text: `${SHARE_LINES[k]} ${pageUrl(shareIdx, 'share', `line${k + 1}`)}` }); } catch {}
 });
