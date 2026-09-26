@@ -202,6 +202,7 @@ body.is-playing .stage.live .st-song .mini{animation:spin 3.2s linear infinite}
   .slide .stage{flex:1;padding:18px;gap:10px;min-height:100%;border-radius:24px}
   .st-word{font-size:44px}
   .slide .lyrics{height:auto;flex:1;min-height:150px}
+  .slide .st-song{display:none}
   .ln{font-size:19px}
   .ctl{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:30;height:var(--ctl-h);padding:8px 12px 8px 10px;background:color-mix(in srgb,var(--bg) 70%,transparent)}
   .ctl .opt-label{display:none}
@@ -344,10 +345,10 @@ function stageHTML(i) {
     <h2 class="st-word">${esc(e.word)}</h2>
     <div class="st-row"><button class="st-ipa" type="button" data-say="${esc(e.word)}" aria-label="朗读 ${esc(e.word)}">${spk}<span>${esc(e.phonetic)}</span></button><p class="st-mean">${esc(e.meaning)}</p></div>
     <p class="st-en">${esc(e.en)}</p>
-    <div class="lyrics"><div class="lyrics-in"><p class="lyr-msg">正在加载歌词…</p></div></div>
-    <div class="st-song"><img class="mini" src="${thumb(e)}" alt="" loading="lazy"><div><b>${esc(e.title)}</b><span>${esc(e.artist)}</span></div></div>
-    ${e.formNote ? `<p class="st-note">${esc(e.formNote)}</p>` : ''}
     ${e.tip ? `<div class="st-tip"><b>搭配</b>${esc(e.tip)}</div>` : ''}
+    ${e.formNote ? `<p class="st-note">${esc(e.formNote)}</p>` : ''}
+    <div class="st-song"><img class="mini" src="${thumb(e)}" alt="" loading="lazy"><div><b>${esc(e.title)}</b><span>${esc(e.artist)}</span></div></div>
+    <div class="lyrics"><div class="lyrics-in"><p class="lyr-msg">正在加载歌词…</p></div></div>
   </article>`;
 }
 const grid = $('#grid'), carousel = $('#carousel'), deskStage = $('#deskStage');
