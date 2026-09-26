@@ -855,7 +855,9 @@ function maybeSurvey(i) {
 renderWant();
 
 /* ---------- share image ---------- */
-const pageUrl = (i, src) => location.origin + location.pathname + (src ? `?utm_source=${src}` : '') + '#' + encodeURIComponent(DATA[i].word);
+const pageUrl = (i, src, content) => location.origin + location.pathname + (src ? `?utm_source=${src}` : '') + (content ? `&utm_content=${content}` : '') + '#' + encodeURIComponent(DATA[i].word);
+// share text takes turns through these; utm_content carries which one, so visits can be credited to a line
+const SHARE_LINES = ['每个单词，都有一首歌', '听歌，顺便把单词背了', '唱过的词，忘不掉', '单曲循环过的歌词，想忘都难', '这首歌里，藏着一个考试词', '背单词这件事，终于不无聊了'];
 const loadImg = src => new Promise((ok, no) => { const im = new Image(); im.crossOrigin = 'anonymous'; im.onload = () => ok(im); im.onerror = no; im.src = src; });
 function rrect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
 function fitFont(g, text, weight, family, max, width) { let size = max; do { g.font = `${weight} ${size}px ${family}`; size -= 4; } while (g.measureText(text).width > width && size > 24); return g.font; }
@@ -978,8 +980,9 @@ $('#sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeS
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#sheet').hidden) closeShare(); if (e.key === 'Escape' && !$('#survey').hidden) { store.set('stw.survey', 1); closeSurvey(); } });
 $('#shareNative').addEventListener('click', async () => {
   const e = DATA[shareIdx];
-  track('share', { word: e.word });
-  try { await navigator.share({ files: [shareFile], title: `Singlish · ${e.word}`, text: `每个单词，都有一首歌 ${pageUrl(shareIdx, 'share')}` }); } catch {}
+  const k = store.get('stw.line', 0) % SHARE_LINES.length; store.set('stw.line', k + 1);
+  track('share', { word: e.word, line: k + 1 });
+  try { await navigator.share({ files: [shareFile], title: `Singlish · ${e.word}`, text: `${SHARE_LINES[k]} ${pageUrl(shareIdx, 'share', `line${k + 1}`)}` }); } catch {}
 });
 $('#shareSave').addEventListener('click', async () => {
   if (!shareUrl) return;
