@@ -805,7 +805,7 @@ counter('get', 'want').then(v => { wantCount = v; renderWant(); }).catch(() => {
 function vote(kind) {
   const prev = store.get('stw.vote', null);
   if (prev === 'want' || prev === kind) return;
-  track('vote', { kind });
+  track(kind);   // 'want' or 'meh', each its own event
   store.set('stw.vote', kind); store.set('stw.survey', 1);
   if (kind === 'want' && wantCount != null) wantCount++;
   renderWant();
