@@ -931,13 +931,14 @@ async function makeCard(i) {
   // footer: wordmark + caption on the left, QR code to this word on the right
   const qs = 150, qx = W - 80 - qs, qy = H - 80 - qs;
   if (window.qrcode) {
-    const q = qrcode(0, 'M'); q.addData(pageUrl(i, 'poster')); q.make();
+    const q = qrcode(0, 'M'); q.addData(pageUrl(i, 'sharing')); q.make();
     const n = q.getModuleCount(), pad = 12, cell = (qs - pad * 2) / n;
     g.fillStyle = '#FFFFFF'; rrect(g, qx, qy, qs, qs, 16); g.fill(); g.fillStyle = '#0B0A14';
     for (let a = 0; a < n; a++) for (let b = 0; b < n; b++) if (q.isDark(a, b)) g.fillRect(Math.floor(qx + pad + b * cell), Math.floor(qy + pad + a * cell), Math.ceil(cell), Math.ceil(cell));
   }
   g.textAlign = 'left'; g.font = `800 44px ${DISPLAY}`; g.fillStyle = '#F7F5FF'; g.fillText('Sing', 80, qy + 78);
-  const sw = g.measureText('Sing').width; g.fillStyle = grad(80 + sw, 80 + sw + 80); g.fillText('lish', 80 + sw, qy + 78);
+  const sw = g.measureText('Sing').width, lw = g.measureText('lish').width; g.fillStyle = grad(80 + sw, 80 + sw + 80); g.fillText('lish', 80 + sw, qy + 78);
+  g.fillStyle = '#F7F5FF'; g.fillText('.study', 80 + sw + lw, qy + 78);   // the wordmark doubles as the address
   g.font = `500 24px ${BODY}`; g.fillStyle = '#8A86AA'; g.fillText('扫码听这一句', 80, qy + 122);
   return new Promise(ok => c.toBlob(ok, 'image/png'));
 }
