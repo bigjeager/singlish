@@ -204,8 +204,11 @@ body.is-playing .deck-cd{animation-play-state:running}
   .slide .lyrics{height:auto;flex:1;min-height:150px}
   .ln{font-size:19px}
   .ctl{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:30;height:var(--ctl-h);padding:8px 12px 8px 10px;background:color-mix(in srgb,var(--bg) 70%,transparent)}
-  .start{display:flex;position:fixed;inset:0;z-index:35;align-items:flex-end;justify-content:center;padding:0 16px calc(var(--ctl-h) + env(safe-area-inset-bottom,0px) + 28px);background:linear-gradient(transparent 40%,rgba(11,10,20,.85))}
-  .start button{border:0;background:var(--grad);color:#1A0C14;border-radius:999px;padding:15px 26px;font-weight:800;font-size:17px;box-shadow:0 12px 36px rgba(255,77,141,.5);display:flex;flex-direction:column;align-items:center;gap:1px}
+  /* first-visit gate: blur everything behind it and put one obvious button in the middle */
+  .start{display:flex;position:fixed;inset:0;z-index:50;align-items:center;justify-content:center;padding:16px;cursor:pointer;
+    background:rgba(11,10,20,.45);backdrop-filter:blur(14px) saturate(1.1);-webkit-backdrop-filter:blur(14px) saturate(1.1)}
+  .start button{border:0;background:var(--grad);color:#1A0C14;border-radius:999px;padding:18px 32px;font-weight:800;font-size:19px;box-shadow:0 12px 36px rgba(255,77,141,.5);display:flex;flex-direction:column;align-items:center;gap:2px;animation:breathe 2.4s ease-in-out infinite}
+  @keyframes breathe{0%,100%{box-shadow:0 12px 36px rgba(255,77,141,.45),0 0 0 0 rgba(255,77,141,.35)}50%{box-shadow:0 12px 40px rgba(255,77,141,.6),0 0 0 14px rgba(255,77,141,0)}}
   .start button small{font-weight:600;font-size:12px;opacity:.8}
 }
 @media (max-width:420px){ .ctl .time{display:none} }
@@ -825,7 +828,8 @@ $('#next').addEventListener('click', () => { prime(state.cur); state.started = t
 $('#replay').addEventListener('click', () => { prime(state.cur); state.started = true; play(state.cur); });
 const tog = (id, key) => { const b = $(id); b.setAttribute('aria-pressed', !!state[key]); b.addEventListener('click', () => { state[key] = !state[key]; b.setAttribute('aria-pressed', state[key]); if (key === 'shuffle') store.set('stw.shuffle', state.shuffle); }); };
 tog('#shuffle', 'shuffle'); tog('#loop', 'loop');
-$('#startBtn').addEventListener('click', () => { prime(state.cur); state.started = true; $('#start').hidden = true; play(state.cur); });
+// the whole gate is tappable, not just the button
+$('#start').addEventListener('click', () => { prime(state.cur); state.started = true; $('#start').hidden = true; play(state.cur); });
 $('#openList').addEventListener('click', () => { $('#browser').classList.add('open'); grid.querySelector('.card.on')?.scrollIntoView({ block: 'center' }); });
 $('#closeList').addEventListener('click', () => $('#browser').classList.remove('open'));
 document.addEventListener('keydown', e => {
