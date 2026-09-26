@@ -941,6 +941,12 @@ async function makeCard(i) {
   g.textAlign = 'left'; g.font = `800 44px ${DISPLAY}`; g.fillStyle = '#F7F5FF'; g.fillText('Sing', 80, qy + 78);
   const sw = g.measureText('Sing').width, lw = g.measureText('lish').width; g.fillStyle = grad(80 + sw, 80 + sw + 80); g.fillText('lish', 80 + sw, qy + 78);
   g.fillStyle = '#F7F5FF'; g.fillText('.study', 80 + sw + lw, qy + 78);   // the wordmark doubles as the address
+  // a "preview" tag after the address, drawn like the site's 完整版 pill: hot-pink outline and text
+  const px = 80 + sw + lw + g.measureText('.study').width + 16;
+  g.font = `700 22px ${BODY}`; const pw = g.measureText('preview').width + 28, ph = 36, py = qy + 78 - 32;
+  g.fillStyle = 'rgba(255,77,141,.12)'; rrect(g, px, py, pw, ph, ph / 2); g.fill();
+  g.strokeStyle = 'rgba(255,77,141,.45)'; g.lineWidth = 2; rrect(g, px, py, pw, ph, ph / 2); g.stroke();
+  g.fillStyle = '#FF9DC0'; g.textBaseline = 'middle'; g.fillText('preview', px + 14, py + ph / 2 + 1); g.textBaseline = 'alphabetic';
   g.font = `500 24px ${BODY}`; g.fillStyle = '#8A86AA'; g.fillText('每个单词，都有一首歌', 80, qy + 122);
   return new Promise(ok => c.toBlob(ok, 'image/png'));
 }
