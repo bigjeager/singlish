@@ -565,6 +565,7 @@ let unlocked = false, priming = false;
 // iOS only lets audio start inside a tap; start (muted) right in the gesture so later swipes can play freely.
 function prime(i) {
   if (unlocked || !au.paused) return; unlocked = true;
+  store.set('stw.seen', 1);   // came through the start gate once: skip it on later visits
   if (au.src !== DATA[i].preview) au.src = DATA[i].preview;
   au.muted = true; priming = true;
   // the unlock play() can resolve late; only pause it if real playback hasn't started meanwhile
@@ -728,6 +729,7 @@ function goPrev() {
 function go(i, autoplay, back) {
   i = (i + DATA.length) % DATA.length;
   try { history.replaceState(null, '', '#' + encodeURIComponent(DATA[i].word)); } catch {}
+  store.set('stw.pos', { word: DATA[i].word, ci: DATA[i].ci });   // reopen here next time
   if (i !== state.cur && !back) { hist.push(state.cur); if (hist.length > 200) hist.shift(); }
   if (i !== state.cur || !artFlip) setArt(i);
   stop();
@@ -1031,6 +1033,7 @@ function switchClip(i, dir = 1) {
   const en = DATA[i]; if (!en || en.clips.length < 2) return;
   prime(i); state.started = true;
   useClip(en, (en.ci + dir + en.clips.length) % en.clips.length); lyr.delete(i);
+  store.set('stw.pos', { word: en.word, ci: en.ci });
   stop();
   if (isMobile()) { const sl = carousel.children[i]; if (sl) sl.innerHTML = stageHTML(i); } else deskStage.innerHTML = stageHTML(i);
   const st = currentRoot();
@@ -1109,7 +1112,7 @@ document.addEventListener('keydown', e => {
 });
 function applyMode() {
   stop();
-  if (isMobile()) { buildCarousel(); requestAnimationFrame(() => go(state.cur, false)); }
+  if (isMobile()) { if (store.get('stw.seen', 0)) $('#start').hidden = true; buildCarousel(); requestAnimationFrame(() => go(state.cur, false)); }
   else { $('#start').hidden = true; go(state.cur, false); }
 }
 mq.addEventListener('change', applyMode);
@@ -1125,7 +1128,10 @@ fetch('preview.json')   /* the 100-word preview set; the full bank lives in data
   list.forEach(e => useClip(e, 0));
   ALL = list;
   // deep link from a shared card: #word opens that word, switching to 全部 if the chosen dictionary lacks it
-  const w = decodeURIComponent(location.hash.slice(1));
+  // no #word: pick up where this browser left off, on the same song
+  const pos = store.get('stw.pos', null), w = decodeURIComponent(location.hash.slice(1)) || pos?.word || '';
+  const back = pos && ALL.find(e => e.word === pos.word && e.word === w);
+  if (back && pos.ci > 0 && pos.ci < back.clips.length) useClip(back, pos.ci);
   const has = ALL.some(e => e.word === w && inDict(e, state.dict));
   applyDict(w && ALL.some(e => e.word === w) && !has ? 'all' : state.dict, w || null);
 }).catch(() => { grid.innerHTML = '<p class="empty">词库加载失败，请检查网络后刷新。</p>'; });
