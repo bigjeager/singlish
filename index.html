@@ -288,7 +288,6 @@ body.is-playing .deck-cd{animation-play-state:running}
 .survey-card p{margin:0;color:var(--soft);font-size:14px}
 .survey-list{margin:0;padding:0;list-style:none;display:grid;gap:6px;color:var(--soft);font-size:14px;text-align:left}
 .survey-list li::before{content:"♪ ";color:var(--hot)}
-.survey-list b{color:var(--ink)}
 .survey-actions{display:flex;gap:10px;justify-content:center;margin-top:6px}
 .survey-actions button{height:46px;flex:1;border-radius:999px;font-weight:800;font-size:15px;border:1px solid var(--stroke-2);background:var(--glass-2);color:var(--ink)}
 .survey-actions .want-btn{border:0;justify-content:center;background:var(--grad);color:#1A0C14;box-shadow:0 6px 20px rgba(255,77,141,.35)}
@@ -361,7 +360,7 @@ body.is-playing .deck-cd{animation-play-state:running}
     </div>
     <p class="count" id="countLine"></p>
     <div class="grid" id="grid"></div>
-    <div class="want want-mob"><b>完整版 1500+ 词，敬请期待</b><span class="grow"></span><button type="button" class="want-btn" data-want aria-pressed="false">♥ 想要</button><span class="want-count" data-want-count></span></div>
+    <div class="want want-mob"><b>完整版，敬请期待</b><span class="grow"></span><button type="button" class="want-btn" data-want aria-pressed="false">♥ 想要</button><span class="want-count" data-want-count></span></div>
   </section>
 
   <aside class="aside">
@@ -384,7 +383,7 @@ body.is-playing .deck-cd{animation-play-state:running}
 
   <div class="carousel" id="carousel" aria-label="左右滑动切换单词"></div>
 
-  <div class="want want-desk"><b>完整版 1500+ 词，敬请期待</b><span class="grow"></span><button type="button" class="want-btn" data-want aria-pressed="false">♥ 想要</button><span class="want-count" data-want-count></span></div>
+  <div class="want want-desk"><b>完整版，敬请期待</b><span class="grow"></span><button type="button" class="want-btn" data-want aria-pressed="false">♥ 想要</button><span class="want-count" data-want-count></span></div>
   <p class="foot">歌曲片段为 Apple Music 官方 30 秒试听，逐行时间轴歌词实时取自 LRCLIB 公共歌词库，词曲版权归原作者及唱片公司。每个片段只截取唱到目标词的前后几句，逐词高亮按试听音频里的实际演唱时间同步。</p>
 </main>
 
@@ -392,7 +391,7 @@ body.is-playing .deck-cd{animation-play-state:running}
   <div class="survey-card">
     <button type="button" class="survey-x" id="surveyClose" aria-label="关闭">×</button>
     <h3 id="surveyTitle">完整版，敬请期待</h3>
-    <ul class="survey-list"><li><b>1500+</b> 个考试词，覆盖四级、六级、托福、雅思</li><li>每个词最多 3 首歌，180 位歌手</li><li>生词本和复习，曲风 / 歌手偏好，跟唱模式</li></ul>
+    <ul class="survey-list"><li>覆盖更多字典</li><li>打卡 / 复习</li><li>曲风偏好</li><li>跟唱模式</li></ul>
     <div class="survey-actions"><button type="button" class="want-btn" data-want>♥ 想要</button><button type="button" id="surveyMeh">一般般</button></div>
   </div>
 </div>
