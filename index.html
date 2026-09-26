@@ -18,6 +18,7 @@
 <meta name="twitter:title" content="Singlish · 听歌记单词">
 <meta name="twitter:description" content="100 个雅思词，每个都藏在一段流行歌里。">
 <meta name="twitter:image" content="https://singlish.study/og.png">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="fba457cc-095a-4b9a-a30f-5c8a0d3aeaa3" data-domains="singlish.study"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Gentium+Book+Plus&display=swap">
@@ -411,6 +412,8 @@ let ALL = [], DATA = [];   // ALL: the whole word bank; DATA: the words of the c
 const PREFIX = { '~a/': 'https://audio-ssl.itunes.apple.com/itunes-assets/', '~i/': 'https://is1-ssl.mzstatic.com/image/thumb/', '~m/': 'https://music.apple.com/us/' };
 const expand = u => u && u[0] === '~' ? PREFIX[u.slice(0, 3)] + u.slice(3) : u;
 // a word can have several clips (songs); the active one's fields live on the entry itself
+/* Umami custom events; a no-op if the script is blocked or not loaded yet */
+function track(name, data) { try { window.umami?.track(name, data); } catch {} }
 function useClip(e, k) { e.ci = k; Object.assign(e, e.clips[k]); }
 const DICT_NAME = { ielts: '雅思', cet4: '四级', cet6: '六级', toefl: '托福' };
 const $ = (s, r = document) => r.querySelector(s);
@@ -599,6 +602,7 @@ async function play(i, from) {
   $('#clipTag').textContent = `片段 ${fmt(L.start)}–${fmt(L.end)}`;
   seekPlay(DATA[i].preview, Math.max(L.start, from ?? L.start) - DATA[i].offset);
   const w = DATA[i].word; if (!state.done.has(w)) { state.done.add(w); store.set('stw.done', [...state.done]); markCards(); }
+  track('play', { word: w, song: `${DATA[i].artist} - ${DATA[i].title}`, dict: state.dict });
   P.raf = requestAnimationFrame(frame);
   preload(i + 1); preload(i + 2);
 }
@@ -802,6 +806,7 @@ counter('get', 'want').then(v => { wantCount = v; renderWant(); }).catch(() => {
 function vote(kind) {
   const prev = store.get('stw.vote', null);
   if (prev === 'want' || prev === kind) return;
+  track('vote', { kind });
   store.set('stw.vote', kind); store.set('stw.survey', 1);
   if (kind === 'want' && wantCount != null) wantCount++;
   renderWant();
@@ -911,6 +916,7 @@ async function makeCard(i) {
 }
 let shareFile = null, shareIdx = 0, shareUrl = '';
 async function openShare(i) {
+  track('share-open', { word: DATA[i].word });
   shareIdx = i; shareFile = null;
   const sheet = $('#sheet'), img = $('#sheetImg');
   sheet.hidden = false; img.hidden = true; $('#sheetBusy').hidden = false;
@@ -944,6 +950,7 @@ $('#sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeS
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#sheet').hidden) closeShare(); if (e.key === 'Escape' && !$('#survey').hidden) { store.set('stw.survey', 1); closeSurvey(); } });
 $('#shareNative').addEventListener('click', async () => {
   const e = DATA[shareIdx];
+  track('share', { word: e.word });
   try { await navigator.share({ files: [shareFile], title: `Singlish · ${e.word}`, text: `${e.word} ${e.meaning} —— 听 ${e.artist}《${e.title}》记单词 ${pageUrl(shareIdx)}` }); } catch {}
 });
 $('#shareSave').addEventListener('click', async () => {
@@ -964,7 +971,12 @@ grid.addEventListener('click', e => {
   $('#browser').classList.remove('open');
   go(+c.dataset.i, true);
 });
-$('#q').addEventListener('input', renderGrid);
+let searchTimer;
+$('#q').addEventListener('input', () => {
+  renderGrid();
+  clearTimeout(searchTimer);   // log what people settle on, not every keystroke
+  searchTimer = setTimeout(() => { const q = $('#q').value.trim().toLowerCase(); if (q.length > 1) track('search', { q }); }, 1500);
+});
 function applyDict(d, keepWord) {
   if (d !== 'all' && !ALL.some(e => e.tags.includes(d))) d = 'all';
   state.dict = d; store.set('stw.dict', d);
@@ -975,11 +987,12 @@ function applyDict(d, keepWord) {
   $('#totalCount').textContent = DATA.length;
   renderGrid(); applyMode();
 }
-$('#dictChips').addEventListener('click', e => { const b = e.target.closest('button'); if (b) applyDict(b.dataset.d, DATA[state.cur]?.word); });
+$('#dictChips').addEventListener('click', e => { const b = e.target.closest('button'); if (b) track('dict', { dict: b.dataset.d }); if (b) applyDict(b.dataset.d, DATA[state.cur]?.word); });
 function switchClip(i, dir = 1) {
   const en = DATA[i]; if (!en || en.clips.length < 2) return;
   prime(i); state.started = true;
   useClip(en, (en.ci + dir + en.clips.length) % en.clips.length); lyr.delete(i);
+  track('switch-song', { word: en.word });
   stop();
   if (isMobile()) { const sl = carousel.children[i]; if (sl) sl.innerHTML = stageHTML(i); } else deskStage.innerHTML = stageHTML(i);
   const st = currentRoot();
