@@ -210,7 +210,7 @@ body.is-playing .deck-cd{animation-play-state:running}
   .tagline,.prog-bar{display:none}
   .btn-list{display:inline-block;flex:none;white-space:nowrap}
   .top .logo,.full-pill{flex:none}
-  .btn-fav{width:34px;height:34px;padding:0;color:var(--amber);font-size:15px;line-height:1}
+  #openList{display:inline-flex;align-items:center;gap:5px}
   /* z-index:auto so the fixed word-list panel (z 40) can sit above the header (z 20) */
   .app{display:flex;flex-direction:column;padding:0;flex:1;min-height:0;min-width:0;gap:0;width:100%;max-width:100vw;z-index:auto}
   .aside{position:static;display:contents}
@@ -344,8 +344,7 @@ body.is-playing .deck-cd{animation-play-state:running}
   <p class="tagline">听歌记单词 · 每个雅思词都藏在一段流行歌里</p>
   <div class="grow"></div>
   <div class="prog"><div class="prog-bar"><i id="progFill"></i></div><span><b id="doneCount">0</b> / <span id="totalCount">100</span><span class="prog-word"> 已唱</span></span></div>
-  <button class="btn-list btn-fav" id="openFav" type="button" aria-label="我的收藏" title="我的收藏">★</button>
-  <button class="btn-list" id="openList" type="button">词表</button>
+  <button class="btn-list" id="openList" type="button" aria-label="切换词表"><span id="listName">全部</span><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
 </header>
 
 <main class="app">
@@ -1013,10 +1012,14 @@ $('#q').addEventListener('input', () => {
   searchTimer = setTimeout(() => { const q = $('#q').value.trim().toLowerCase(); if (q.length > 1) track('search', { q }); }, 1500);
 });
 function applyDict(d, keepWord) {
-  if (d === 'fav' && !state.fav.size) { $('#countLine').textContent = '还没有收藏：点单词卡右上角的 ☆ 就能加进生词本'; return; }
+  if (d === 'fav' && !state.fav.size) {
+    if (DATA.length) { $('#countLine').textContent = '还没有收藏：点单词卡右上角的 ☆ 就能加进生词本'; return; }
+    d = 'all';   // first load with an emptied 生词本: don't open on a blank list
+  }
   if (!ALL.some(e => inDict(e, d))) d = 'all';
   state.dict = d; store.set('stw.dict', d);
   $('#dictChips').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x.dataset.d === d));
+  $('#listName').textContent = d === 'all' ? '全部' : d === 'fav' ? '收藏' : DICT_NAME[d];   // the header button names the list you're in
   stop(); lyr.clear(); filled.clear(); carousel.innerHTML = ''; hist.length = 0;
   DATA = d === 'all' ? ALL : ALL.filter(e => inDict(e, d));
   state.cur = Math.max(0, DATA.findIndex(e => e.word === keepWord));
@@ -1095,8 +1098,6 @@ function openList() {
   if (c) panel.scrollTop = c.offsetTop - panel.clientHeight / 2 + c.offsetHeight / 2;
 }
 $('#openList').addEventListener('click', openList);
-// shortcut to 词表 → ★ 收藏 (with no favorites yet, the list stays put and shows how to add one)
-$('#openFav').addEventListener('click', () => { track('open-fav', { n: state.fav.size }); if (state.dict !== 'fav') applyDict('fav', DATA[state.cur]?.word); openList(); });
 $('#closeList').addEventListener('click', () => $('#browser').classList.remove('open'));
 document.addEventListener('keydown', e => {
   if (e.target.matches('input,select,textarea')) return;
