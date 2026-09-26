@@ -602,7 +602,6 @@ async function play(i, from) {
   $('#clipTag').textContent = `片段 ${fmt(L.start)}–${fmt(L.end)}`;
   seekPlay(DATA[i].preview, Math.max(L.start, from ?? L.start) - DATA[i].offset);
   const w = DATA[i].word; if (!state.done.has(w)) { state.done.add(w); store.set('stw.done', [...state.done]); markCards(); }
-  track('play', { word: w, song: `${DATA[i].artist} - ${DATA[i].title}`, dict: state.dict });
   P.raf = requestAnimationFrame(frame);
   preload(i + 1); preload(i + 2);
 }
@@ -992,7 +991,6 @@ function switchClip(i, dir = 1) {
   const en = DATA[i]; if (!en || en.clips.length < 2) return;
   prime(i); state.started = true;
   useClip(en, (en.ci + dir + en.clips.length) % en.clips.length); lyr.delete(i);
-  track('switch-song', { word: en.word });
   stop();
   if (isMobile()) { const sl = carousel.children[i]; if (sl) sl.innerHTML = stageHTML(i); } else deskStage.innerHTML = stageHTML(i);
   const st = currentRoot();
