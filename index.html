@@ -5,6 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0B0A14">
 <title>Singlish</title>
+<meta name="description" content="听歌记单词：100 个雅思词，每个都藏在一段流行歌里。Apple Music 官方试听 + 卡拉 OK 同步歌词。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Singlish">
+<meta property="og:title" content="Singlish · 听歌记单词">
+<meta property="og:description" content="100 个雅思词，每个都藏在一段流行歌里。点一下，听歌手把这个词唱出来。">
+<meta property="og:url" content="https://bigjeager.github.io/singlish/">
+<meta property="og:image" content="https://bigjeager.github.io/singlish/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Singlish · 听歌记单词">
+<meta name="twitter:description" content="100 个雅思词，每个都藏在一段流行歌里。">
+<meta name="twitter:image" content="https://bigjeager.github.io/singlish/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Gentium+Book+Plus&display=swap">
@@ -264,6 +277,10 @@ body.is-playing .deck-cd{animation-play-state:running}
 .sheet-actions button{height:44px;border-radius:999px;padding:0 18px;font-weight:700;font-size:14px;border:1px solid var(--stroke-2);background:var(--glass-2);color:var(--ink)}
 .sheet-actions .primary{border:0;background:var(--grad);color:#1A0C14}
 .sheet-hint{margin:0;color:var(--muted);font-size:12px;text-align:center}
+.sheet-hint:empty{display:none}
+.sheet-hint{line-height:1.7}
+.sheet-hint.strong{font-size:15px;font-weight:700;color:var(--ink)}
+.sheet-hint small{font-size:12px;font-weight:500;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -846,9 +863,24 @@ async function openShare(i) {
     const blob = await makeCard(i);
     shareFile = new File([blob], `singlish-${DATA[i].word}.png`, { type: 'image/png' });
     if (shareUrl) URL.revokeObjectURL(shareUrl);
-    shareUrl = URL.createObjectURL(blob); img.src = shareUrl; img.hidden = false; $('#sheetBusy').hidden = true;
-    $('#shareNative').hidden = !(navigator.canShare && navigator.canShare({ files: [shareFile] }));
+    shareUrl = URL.createObjectURL(blob);
+    // a data: URL (not blob:) so long-press "save image" works in in-app browsers such as WeChat
+    img.src = await new Promise(ok => { const f = new FileReader(); f.onload = () => ok(f.result); f.readAsDataURL(blob); });
+    img.hidden = false; $('#sheetBusy').hidden = true;
+    setShareMode();
   } catch { $('#sheetBusy').textContent = '分享图生成失败，请检查网络后重试。'; }
+}
+// Phones can't put a download into the photo library; the system share sheet ("Save Image") or a
+// long-press can. In-app browsers (WeChat etc.) have neither share sheet nor downloads: long-press only.
+const touch = matchMedia('(pointer: coarse)').matches, inApp = /MicroMessenger|QQ\/|Weibo|DingTalk|Lark|Feishu/i.test(navigator.userAgent);
+function setShareMode() {
+  const canFiles = !!(navigator.canShare && shareFile && navigator.canShare({ files: [shareFile] }));
+  const save = $('#shareSave'), native = $('#shareNative'), hint = $('#sheetHint');
+  native.hidden = !canFiles;
+  if (touch && canFiles) { save.textContent = '保存到相册'; save.hidden = false; hint.innerHTML = '发朋友圈：点「分享」→ 选「微信」→「分享到朋友圈」<br>存相册：点「保存到相册」→「存储图像」'; }
+  else if (touch) { save.hidden = true; hint.innerHTML = '长按图片，保存到相册<br><small>再去朋友圈发表，从相册选这张图</small>'; hint.classList.add('strong'); }
+  else { save.textContent = '保存图片'; save.hidden = false; hint.textContent = ''; }
+  if (inApp) { save.hidden = true; native.hidden = true; hint.innerHTML = '长按图片，保存到相册<br><small>再去朋友圈发表，从相册选这张图</small>'; hint.classList.add('strong'); }
 }
 function closeShare() { $('#sheet').hidden = true; }
 $('#shareClose').addEventListener('click', closeShare);
@@ -858,8 +890,9 @@ $('#shareNative').addEventListener('click', async () => {
   const e = DATA[shareIdx];
   try { await navigator.share({ files: [shareFile], title: `Singlish · ${e.word}`, text: `${e.word} ${e.meaning} —— 听 ${e.artist}《${e.title}》记单词 ${pageUrl(shareIdx)}` }); } catch {}
 });
-$('#shareSave').addEventListener('click', () => {
+$('#shareSave').addEventListener('click', async () => {
   if (!shareUrl) return;
+  if (touch && navigator.canShare?.({ files: [shareFile] })) { try { await navigator.share({ files: [shareFile] }); } catch {} return; }   // → "Save Image"
   const a = document.createElement('a'); a.href = shareUrl; a.download = shareFile.name; document.body.appendChild(a); a.click(); a.remove();
 });
 $('#shareCopy').addEventListener('click', async () => {
