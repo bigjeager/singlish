@@ -286,6 +286,9 @@ body.is-playing .deck-cd{animation-play-state:running}
 .survey-card{position:relative;width:min(360px,100%);padding:28px 24px 22px;border-radius:24px;background:#181530;border:1px solid var(--stroke-2);box-shadow:0 24px 70px rgba(0,0,0,.6);text-align:center;display:flex;flex-direction:column;gap:12px}
 .survey-card h3{margin:0;font:800 24px var(--f-display);letter-spacing:-.02em}
 .survey-card p{margin:0;color:var(--soft);font-size:14px}
+.survey-list{margin:0;padding:0;list-style:none;display:grid;gap:6px;color:var(--soft);font-size:14px;text-align:left}
+.survey-list li::before{content:"♪ ";color:var(--hot)}
+.survey-list b{color:var(--ink)}
 .survey-actions{display:flex;gap:10px;justify-content:center;margin-top:6px}
 .survey-actions button{height:46px;flex:1;border-radius:999px;font-weight:800;font-size:15px;border:1px solid var(--stroke-2);background:var(--glass-2);color:var(--ink)}
 .survey-actions .want-btn{border:0;justify-content:center;background:var(--grad);color:#1A0C14;box-shadow:0 6px 20px rgba(255,77,141,.35)}
@@ -310,6 +313,10 @@ body.is-playing .deck-cd{animation-play-state:running}
 /* ---------- share ---------- */
 .st-share{border:1px solid var(--stroke-2);background:transparent;color:var(--soft);border-radius:50%;width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;transition:background .15s,color .15s}
 .st-share:hover{background:var(--ink);color:var(--bg)}
+.st-fav{font-size:15px;line-height:1}
+.st-fav[aria-pressed="true"]{color:var(--amber);border-color:var(--amber)}
+.st-fav[aria-pressed="true"]:hover{background:transparent;color:var(--amber)}
+.card.fav .no::before{content:"★ ";color:var(--amber)}
 .st-top .no{margin-left:auto}
 .sheet{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 16px);background:rgba(6,5,12,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .sheet-card{display:flex;flex-direction:column;align-items:center;gap:14px;max-width:min(440px,100%);max-height:100%}
@@ -349,11 +356,12 @@ body.is-playing .deck-cd{animation-play-state:running}
         <button type="button" data-d="cet4" aria-pressed="false">四级</button>
         <button type="button" data-d="cet6" aria-pressed="false">六级</button>
         <button type="button" data-d="toefl" aria-pressed="false">托福</button>
+        <button type="button" data-d="fav" aria-pressed="false">★ 收藏</button>
       </div>
     </div>
     <p class="count" id="countLine"></p>
     <div class="grid" id="grid"></div>
-    <div class="want want-mob"><b>完整版，敬请期待</b><span class="grow"></span><button type="button" class="want-btn" data-want aria-pressed="false">♥ 想要</button><span class="want-count" data-want-count></span></div>
+    <div class="want want-mob"><b>完整版 1500+ 词，敬请期待</b><span class="grow"></span><button type="button" class="want-btn" data-want aria-pressed="false">♥ 想要</button><span class="want-count" data-want-count></span></div>
   </section>
 
   <aside class="aside">
@@ -376,7 +384,7 @@ body.is-playing .deck-cd{animation-play-state:running}
 
   <div class="carousel" id="carousel" aria-label="左右滑动切换单词"></div>
 
-  <div class="want want-desk"><b>完整版，敬请期待</b><span class="grow"></span><button type="button" class="want-btn" data-want aria-pressed="false">♥ 想要</button><span class="want-count" data-want-count></span></div>
+  <div class="want want-desk"><b>完整版 1500+ 词，敬请期待</b><span class="grow"></span><button type="button" class="want-btn" data-want aria-pressed="false">♥ 想要</button><span class="want-count" data-want-count></span></div>
   <p class="foot">歌曲片段为 Apple Music 官方 30 秒试听，逐行时间轴歌词实时取自 LRCLIB 公共歌词库，词曲版权归原作者及唱片公司。每个片段只截取唱到目标词的前后几句，逐词高亮按试听音频里的实际演唱时间同步。</p>
 </main>
 
@@ -384,7 +392,7 @@ body.is-playing .deck-cd{animation-play-state:running}
   <div class="survey-card">
     <button type="button" class="survey-x" id="surveyClose" aria-label="关闭">×</button>
     <h3 id="surveyTitle">完整版，敬请期待</h3>
-    <p>字典选择，曲风/歌手偏好，跟唱模式，复习...</p>
+    <ul class="survey-list"><li><b>1500+</b> 个考试词，覆盖四级、六级、托福、雅思</li><li>每个词最多 3 首歌，180 位歌手</li><li>生词本和复习，曲风 / 歌手偏好，跟唱模式</li></ul>
     <div class="survey-actions"><button type="button" class="want-btn" data-want>♥ 想要</button><button type="button" id="surveyMeh">一般般</button></div>
   </div>
 </div>
@@ -413,7 +421,11 @@ const PREFIX = { '~a/': 'https://audio-ssl.itunes.apple.com/itunes-assets/', '~i
 const expand = u => u && u[0] === '~' ? PREFIX[u.slice(0, 3)] + u.slice(3) : u;
 // a word can have several clips (songs); the active one's fields live on the entry itself
 /* Umami custom events; a no-op if the script is blocked or not loaded yet */
-function track(name, data) { try { window.umami?.track(name, data); } catch {} }
+function track(name, data) {
+  // the script loads deferred: queue anything sent before it's ready, give up after ~10s (blocked)
+  if (window.umami) { try { umami.track(name, data); } catch {} return; }
+  let n = 0; const t = setInterval(() => { if (window.umami || ++n > 20) { clearInterval(t); try { window.umami?.track(name, data); } catch {} } }, 500);
+}
 function useClip(e, k) { e.ci = k; Object.assign(e, e.clips[k]); }
 const DICT_NAME = { ielts: '雅思', cet4: '四级', cet6: '六级', toefl: '托福' };
 const $ = (s, r = document) => r.querySelector(s);
@@ -427,7 +439,16 @@ const isMobile = () => mq.matches;
 const pad = n => String(n).padStart(3, '0');
 const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
-const state = { dict: store.get('stw.dict', 'all'), cur: 0, loop: false, shuffle: store.get('stw.shuffle', false), done: new Set(store.get('stw.done', [])), started: false };
+const state = { dict: store.get('stw.dict', 'all'), cur: 0, loop: false, shuffle: store.get('stw.shuffle', false), done: new Set(store.get('stw.done', [])), fav: new Set(store.get('stw.fav', [])), started: false };
+const inDict = (e, d) => d === 'all' || (d === 'fav' ? state.fav.has(e.word) : e.tags.includes(d));
+// a return visit: first time we see this browser on a new calendar day, with days since the first visit
+(() => {
+  // local calendar day as YYYY-MM-DD
+  const today = new Date().toLocaleDateString('sv'), first = store.get('stw.first', null), last = store.get('stw.last', null);
+  if (!first) store.set('stw.first', today);
+  else if (last !== today) track('return', { days: Math.round((Date.parse(today) - Date.parse(first)) / 864e5) });
+  store.set('stw.last', today);
+})();
 
 /* ---------- lyrics (fetched at runtime; only the lines around the word are kept) ---------- */
 const lyr = new Map();
@@ -493,7 +514,7 @@ function stageHTML(i) {
   const e = DATA[i];
   const dots = e.clips.length > 1 ? `<div class="clip-dots" role="group" aria-label="这个词的歌曲（上下滑动或 ↑↓ 切换）">${e.clips.map((c, k) => `<button type="button" class="clip-dot${k === e.ci ? ' on' : ''}" data-clipto="${i}:${k}" aria-label="第 ${k + 1} 首：${esc(c.title)}" title="${esc(c.title)} · ${esc(c.artist)}"></button>`).join('')}</div>` : '';
   return `<article class="stage" data-i="${i}">${dots}
-    <div class="st-top"><span class="pill band">${e.tags.includes('ielts') ? `雅思 ${esc(e.band)}` : esc(e.tags.map(t => DICT_NAME[t]).join('·'))}</span><span class="pill">${esc(e.pos)}</span><span class="no">#${pad(i + 1)}</span><button type="button" class="st-share" data-share="${i}" aria-label="分享这个词" title="生成分享图">${shareIco}</button></div>
+    <div class="st-top"><span class="pill band">${e.tags.includes('ielts') ? `雅思 ${esc(e.band)}` : esc(e.tags.map(t => DICT_NAME[t]).join('·'))}</span><span class="pill">${esc(e.pos)}</span><span class="no">#${pad(i + 1)}</span><button type="button" class="st-share st-fav" data-fav="${i}" aria-pressed="${state.fav.has(e.word)}" aria-label="收藏这个词" title="收藏到生词本">${state.fav.has(e.word) ? '★' : '☆'}</button><button type="button" class="st-share" data-share="${i}" aria-label="分享这个词" title="生成分享图">${shareIco}</button></div>
     <h2 class="st-word">${esc(e.word)}</h2>
     <div class="st-row"><button class="st-ipa" type="button" data-say="${esc(e.word)}" aria-label="朗读 ${esc(e.word)}">${spk}<span>${esc(e.phonetic)}</span></button><p class="st-mean">${esc(e.meaning)}</p></div>
     ${e.en ? `<p class="st-en">${esc(e.en)}</p>` : ''}
@@ -525,6 +546,7 @@ function markCards(full) {
     const i = +c.dataset.i;
     c.classList.toggle('on', i === state.cur);
     c.classList.toggle('done', state.done.has(DATA[i].word));
+    c.classList.toggle('fav', state.fav.has(DATA[i].word));
     c.classList.toggle('playing', i === state.cur && P.playing);
   });
   marked = state.cur;
@@ -821,13 +843,15 @@ $('#openFull').addEventListener('click', () => { renderWant(); $('#survey').hidd
 const sungThisVisit = new Set();
 function maybeSurvey(i) {
   if (i < 0) return;
+  const before = sungThisVisit.size;
   sungThisVisit.add(DATA[i].word);
+  if (sungThisVisit.size !== before && [5, 20, 50].includes(sungThisVisit.size)) track('sung', { n: sungThisVisit.size });
   if (sungThisVisit.size >= 5 && !store.get('stw.survey', 0) && !store.get('stw.vote', null) && $('#sheet').hidden) { store.set('stw.survey', 1); $('#survey').hidden = false; track('full-pill', { from: 'auto' }); }
 }
 renderWant();
 
 /* ---------- share image ---------- */
-const pageUrl = i => location.origin + location.pathname + '#' + encodeURIComponent(DATA[i].word);
+const pageUrl = (i, src) => location.origin + location.pathname + (src ? `?utm_source=${src}` : '') + '#' + encodeURIComponent(DATA[i].word);
 const loadImg = src => new Promise((ok, no) => { const im = new Image(); im.crossOrigin = 'anonymous'; im.onload = () => ok(im); im.onerror = no; im.src = src; });
 function rrect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
 function fitFont(g, text, weight, family, max, width) { let size = max; do { g.font = `${weight} ${size}px ${family}`; size -= 4; } while (g.measureText(text).width > width && size > 24); return g.font; }
@@ -903,7 +927,7 @@ async function makeCard(i) {
   // footer: wordmark + caption on the left, QR code to this word on the right
   const qs = 150, qx = W - 80 - qs, qy = H - 80 - qs;
   if (window.qrcode) {
-    const q = qrcode(0, 'M'); q.addData(pageUrl(i)); q.make();
+    const q = qrcode(0, 'M'); q.addData(pageUrl(i, 'poster')); q.make();
     const n = q.getModuleCount(), pad = 12, cell = (qs - pad * 2) / n;
     g.fillStyle = '#FFFFFF'; rrect(g, qx, qy, qs, qs, 16); g.fill(); g.fillStyle = '#0B0A14';
     for (let a = 0; a < n; a++) for (let b = 0; b < n; b++) if (q.isDark(a, b)) g.fillRect(Math.floor(qx + pad + b * cell), Math.floor(qy + pad + a * cell), Math.ceil(cell), Math.ceil(cell));
@@ -950,7 +974,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#sheet
 $('#shareNative').addEventListener('click', async () => {
   const e = DATA[shareIdx];
   track('share', { word: e.word });
-  try { await navigator.share({ files: [shareFile], title: `Singlish · ${e.word}`, text: `${e.word} ${e.meaning} —— 听 ${e.artist}《${e.title}》记单词 ${pageUrl(shareIdx)}` }); } catch {}
+  try { await navigator.share({ files: [shareFile], title: `Singlish · ${e.word}`, text: `${e.word} ${e.meaning} —— 听 ${e.artist}《${e.title}》记单词 ${pageUrl(shareIdx, 'share')}` }); } catch {}
 });
 $('#shareSave').addEventListener('click', async () => {
   if (!shareUrl) return;
@@ -958,6 +982,15 @@ $('#shareSave').addEventListener('click', async () => {
   const a = document.createElement('a'); a.href = shareUrl; a.download = shareFile.name; document.body.appendChild(a); a.click(); a.remove();
 });
 document.addEventListener('click', e => { const b = e.target.closest('[data-share]'); if (b) openShare(+b.dataset.share); });
+// 生词本: stays in the current list until the dictionary is switched, so un-starring doesn't yank the card away
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-fav]'); if (!b) return;
+  const w = DATA[+b.dataset.fav].word, on = !state.fav.has(w);
+  on ? state.fav.add(w) : state.fav.delete(w); store.set('stw.fav', [...state.fav]);
+  document.querySelectorAll(`[data-fav="${b.dataset.fav}"]`).forEach(x => { x.setAttribute('aria-pressed', on); x.textContent = on ? '★' : '☆'; });
+  markCards(true);
+  if (on) track('fav', { word: w, n: state.fav.size });
+});
 
 /* ---------- wiring ---------- */
 document.addEventListener('click', e => {
@@ -977,11 +1010,12 @@ $('#q').addEventListener('input', () => {
   searchTimer = setTimeout(() => { const q = $('#q').value.trim().toLowerCase(); if (q.length > 1) track('search', { q }); }, 1500);
 });
 function applyDict(d, keepWord) {
-  if (d !== 'all' && !ALL.some(e => e.tags.includes(d))) d = 'all';
+  if (d === 'fav' && !state.fav.size) { $('#countLine').textContent = '还没有收藏：点单词卡右上角的 ☆ 就能加进生词本'; return; }
+  if (!ALL.some(e => inDict(e, d))) d = 'all';
   state.dict = d; store.set('stw.dict', d);
   $('#dictChips').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x.dataset.d === d));
   stop(); lyr.clear(); filled.clear(); carousel.innerHTML = ''; hist.length = 0;
-  DATA = d === 'all' ? ALL : ALL.filter(e => e.tags.includes(d));
+  DATA = d === 'all' ? ALL : ALL.filter(e => inDict(e, d));
   state.cur = Math.max(0, DATA.findIndex(e => e.word === keepWord));
   $('#totalCount').textContent = DATA.length;
   renderGrid(); applyMode();
@@ -1085,8 +1119,8 @@ fetch('preview.json')   /* the 100-word preview set; the full bank lives in data
   ALL = list;
   // deep link from a shared card: #word opens that word, switching to 全部 if the chosen dictionary lacks it
   const w = decodeURIComponent(location.hash.slice(1));
-  const inDict = state.dict === 'all' || ALL.some(e => e.word === w && e.tags.includes(state.dict));
-  applyDict(w && ALL.some(e => e.word === w) && !inDict ? 'all' : state.dict, w || null);
+  const has = ALL.some(e => e.word === w && inDict(e, state.dict));
+  applyDict(w && ALL.some(e => e.word === w) && !has ? 'all' : state.dict, w || null);
 }).catch(() => { grid.innerHTML = '<p class="empty">词库加载失败，请检查网络后刷新。</p>'; });
 // a #word typed into the address bar (or another shared link opened in this tab) jumps to that word
 addEventListener('hashchange', () => {
