@@ -979,7 +979,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#sheet
 $('#shareNative').addEventListener('click', async () => {
   const e = DATA[shareIdx];
   track('share', { word: e.word });
-  try { await navigator.share({ files: [shareFile], title: `Singlish · ${e.word}`, text: `${e.word} ${e.meaning} —— 听 ${e.artist}《${e.title}》记单词 ${pageUrl(shareIdx, 'share')}` }); } catch {}
+  try { await navigator.share({ files: [shareFile], title: `Singlish · ${e.word}`, text: `每个单词，都有一首歌 ${pageUrl(shareIdx, 'share')}` }); } catch {}
 });
 $('#shareSave').addEventListener('click', async () => {
   if (!shareUrl) return;
