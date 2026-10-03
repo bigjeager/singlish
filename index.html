@@ -5,346 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0B0A14">
 <title>Singlish</title>
-<meta name="description" content="听歌记单词：100 个雅思词，每个都藏在一段流行歌里。Apple Music 官方试听 + 卡拉 OK 同步歌词。">
+<meta name="description" content="听歌记单词：1500+ 考试词（雅思/四六级/托福），每个都藏在一段流行歌里。Apple Music 官方试听 + 卡拉 OK 同步歌词。">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Singlish">
 <meta property="og:title" content="Singlish · 听歌记单词">
-<meta property="og:description" content="100 个雅思词，每个都藏在一段流行歌里。点一下，听歌手把这个词唱出来。">
+<meta property="og:description" content="1500+ 考试词，每个都藏在一段流行歌里。点一下，听歌手把这个词唱出来。">
 <meta property="og:url" content="https://singlish.study/">
 <meta property="og:image" content="https://singlish.study/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Singlish · 听歌记单词">
-<meta name="twitter:description" content="100 个雅思词，每个都藏在一段流行歌里。">
+<meta name="twitter:description" content="1500+ 考试词，每个都藏在一段流行歌里。">
 <meta name="twitter:image" content="https://singlish.study/og.png">
 <script defer src="https://cloud.umami.is/script.js" data-website-id="fba457cc-095a-4b9a-a30f-5c8a0d3aeaa3" data-domains="singlish.study"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Gentium+Book+Plus&display=swap">
-<style>
-/* A night-mode music app on purpose: one dark look, lit by the current song's cover art. */
-:root{
-  color-scheme:dark;
-  --bg:#0B0A14; --glass:rgba(255,255,255,.055); --glass-2:rgba(255,255,255,.1); --glass-3:rgba(255,255,255,.16);
-  --stroke:rgba(255,255,255,.09); --stroke-2:rgba(255,255,255,.18);
-  --ink:#F7F5FF; --soft:#D4D0EC; --muted:#928EB3; --dim:#5D5A7C;
-  --hot:#FF4D8D; --coral:#FF7A59; --amber:#FFB547; --hl:#FFE14A; --hl-ink:#1D1426;
-  --grad:linear-gradient(95deg,var(--hot),var(--coral) 55%,var(--amber));
-  --f-display:"Bricolage Grotesque","Avenir Next","PingFang SC",system-ui,sans-serif;
-  --f-body:"Figtree",-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
-  --f-ipa:"Gentium Book Plus","Charis SIL","Lucida Sans Unicode","Segoe UI",serif;
-  --ctl-h:76px;
-  --art:none;
-}
-*{box-sizing:border-box}
-[hidden]{display:none!important}
-/* body grows with the content so sticky header + search stay pinned however far the page scrolls (phones pin the body separately) */
-html{height:100%}
-body{min-height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body);-webkit-font-smoothing:antialiased}
-button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
-a{color:var(--amber)}
-:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-
-/* ambient cover-art glow behind everything */
-.ambient{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.ambient i{position:absolute;inset:-15%;background:center/cover no-repeat;filter:blur(90px) saturate(1.7);opacity:0;transition:opacity 1.2s ease;transform:scale(1.1)}
-.ambient i.show{opacity:.5}
-.ambient::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 70% 0%,transparent,var(--bg) 75%)}
-.top,.app,.start{position:relative;z-index:1}
-
-/* ---------- header ---------- */
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;gap:18px;padding:14px 28px;
-  background:color-mix(in srgb,var(--bg) 62%,transparent);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-bottom:1px solid var(--stroke)}
-.logo{display:flex;align-items:center;gap:10px;min-width:0}
-.logo h1{margin:0;font:800 24px/1 var(--f-display);letter-spacing:-.03em;white-space:nowrap}
-.logo h1 span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-.eq{display:inline-flex;align-items:flex-end;gap:3px;height:20px}
-.eq i{width:4px;height:6px;border-radius:2px;background:var(--grad);transition:height .3s}
-.eq i:nth-child(1){height:8px}.eq i:nth-child(2){height:16px}.eq i:nth-child(3){height:11px}.eq i:nth-child(4){height:20px}   /* a still logo when nothing plays */
-body.is-playing .eq i{animation:eq .8s ease-in-out infinite alternate}
-.eq i:nth-child(2){animation-delay:-.2s!important}.eq i:nth-child(3){animation-delay:-.45s!important}.eq i:nth-child(4){animation-delay:-.1s!important}
-@keyframes eq{0%{height:4px}100%{height:20px}}
-.full-pill{position:relative;isolation:isolate;overflow:hidden;flex:none;border:0;border-radius:999px;padding:2px 8px;font-size:11px;line-height:16px;font-weight:700;letter-spacing:.02em;
-  color:#FF9DC0;background:rgba(255,77,141,.12);box-shadow:inset 0 0 0 1px rgba(255,77,141,.45);transition:color .15s,box-shadow .15s}
-/* hover gradient on its own rounded layer, so it always follows the pill shape (no border seams, no square corners) */
-.full-pill::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:var(--grad);opacity:0;transition:opacity .15s}
-@media (hover:hover){ .full-pill:hover{color:#1A0C14;box-shadow:none} .full-pill:hover::before{opacity:1} }
-.tagline{margin:0;color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.top .grow{flex:1}
-.prog{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
-.prog b{color:var(--ink);font-weight:700}
-.prog-bar{width:120px;height:6px;border-radius:99px;background:var(--glass-2);overflow:hidden}
-.prog-bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:inherit;transition:width .6s cubic-bezier(.3,.7,.3,1)}
-.btn-list{display:none;border:1px solid var(--stroke-2);background:var(--glass);border-radius:999px;padding:7px 15px;font-size:13px;font-weight:700}
-
-/* ---------- layout ---------- */
-.app{display:grid;grid-template-columns:minmax(0,1fr) minmax(400px,470px);gap:32px;padding:24px 28px 40px;align-items:start;max-width:1480px;margin:0 auto}
-.browser{min-width:0}
-.filters{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:14px;
-  /* stays in view while the cards scroll: pinned right under the sticky header (53px) */
-  position:sticky;top:calc(env(safe-area-inset-top,0px) + 53px);z-index:15;margin-inline:-10px;padding:12px 10px;
-  background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);border-radius:0 0 18px 18px}
-.search{flex:1 1 240px;position:relative;min-width:0}
-.search svg{position:absolute;left:14px;top:50%;translate:0 -50%;color:var(--muted)}
-.search input{width:100%;height:42px;border:1px solid var(--stroke);background:var(--glass);color:var(--ink);border-radius:999px;padding:0 16px 0 40px;font:inherit;font-size:14px}
-.search input::placeholder{color:var(--muted)}
-.search input:focus{outline:none;border-color:var(--stroke-2);background:var(--glass-2)}
-.chips{display:flex;gap:6px;flex-wrap:wrap}
-.chips button{height:34px;border:1px solid var(--stroke);background:transparent;border-radius:999px;padding:0 14px;font-size:13px;font-weight:600;color:var(--soft)}
-.chips button:hover{background:var(--glass)}
-.chips button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.count{font-size:12px;color:var(--muted);margin:0 0 14px;letter-spacing:.08em;text-transform:uppercase}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(186px,1fr));gap:14px}
-
-/* card = record sleeve with the song's disc peeking out */
-.card{--r:18px;position:relative;overflow:hidden;text-align:left;border:1px solid var(--stroke);background:var(--glass);border-radius:var(--r);padding:16px 16px 14px;display:flex;flex-direction:column;gap:3px;min-height:150px;
-  transition:transform .2s cubic-bezier(.3,.7,.3,1),background .2s,border-color .2s}
-.card:hover{transform:translateY(-3px) rotate(-.4deg);background:var(--glass-2);border-color:var(--stroke-2)}
-.card .disc{position:absolute;top:-18px;right:-18px;width:78px;height:78px;border-radius:50%;overflow:hidden;
-  background:#111;box-shadow:0 0 0 5px rgba(0,0,0,.55),0 6px 18px rgba(0,0,0,.5);transition:transform .35s cubic-bezier(.3,.7,.3,1)}
-.card .disc img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.15)}
-.card .disc::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,var(--bg) 0 5px,rgba(0,0,0,.35) 6px 11px,transparent 12px),repeating-radial-gradient(circle,rgba(0,0,0,.14) 0 1px,transparent 1px 4px)}
-.card:hover .disc{transform:translate(-6px,6px) rotate(40deg)}
-.card.playing .disc{animation:spin 3.2s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.card .no{font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.08em;font-variant-numeric:tabular-nums}
-.card .w{margin-top:10px;font:700 24px/1.05 var(--f-display);letter-spacing:-.025em;overflow-wrap:anywhere;padding-right:30px}
-.card .ph{font:14px/1.3 var(--f-ipa);color:var(--muted)}
-.card .mn{font-size:13px;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card .sg{margin-top:auto;padding-top:10px;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card .sg b{color:var(--soft);font-weight:600}
-.card.done .no::after{content:"  ✓ 已唱";color:var(--amber);letter-spacing:.04em}
-.card.on{border-color:transparent;background:linear-gradient(var(--bg),var(--bg)) padding-box,var(--grad) border-box;border:1.5px solid transparent}
-.card.on .w{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-.card .w.long{font-size:clamp(16px,4.6vw,21px);letter-spacing:-.035em;overflow-wrap:normal}
-.empty{color:var(--muted);padding:40px 0;text-align:center;grid-column:1/-1}
-
-/* ---------- now playing ---------- */
-.aside{position:sticky;top:calc(env(safe-area-inset-top,0px) + 86px);display:flex;flex-direction:column;gap:12px;
-  height:calc(100dvh - env(safe-area-inset-top,0px) - 86px - 16px);min-height:520px}
-.aside > .deck{flex:none;aspect-ratio:auto;height:clamp(140px,22dvh,210px)}
-#deskStage{flex:1;min-height:0;display:flex}
-#deskStage .stage{flex:1;min-height:0;overflow:hidden}
-#deskStage .lyrics{flex:1;height:auto;min-height:110px}
-.aside > .ctl,.aside > .hint{flex:none}
-.deck{position:relative;overflow:hidden;border-radius:26px;aspect-ratio:16/9;max-width:100%;display:flex;align-items:center;gap:22px;padding:22px;background:#15121F;box-shadow:0 20px 60px rgba(0,0,0,.55),0 0 0 1px var(--stroke)}
-.deck-bg{position:absolute;inset:-20%;background:center/cover no-repeat;filter:blur(40px) saturate(1.6) brightness(.7);transition:background-image .6s}
-.deck-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,rgba(11,10,20,.25),rgba(11,10,20,.8) 70%)}
-/* the cover itself is the CD: same disc treatment as the cards, spinning while a clip plays */
-.deck-cd{position:relative;flex:none;height:100%;aspect-ratio:1;z-index:1;border-radius:50%;overflow:hidden;background:#111;
-  box-shadow:0 0 0 6px rgba(0,0,0,.55),0 14px 40px rgba(0,0,0,.6);animation:spin 5s linear infinite;animation-play-state:paused}
-body.is-playing .deck-cd{animation-play-state:running}
-.deck-cd img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.15)}
-.deck-cd::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,#15121F 0 6%,rgba(0,0,0,.35) 6.5% 13%,transparent 13.5%),repeating-radial-gradient(circle,rgba(0,0,0,.14) 0 1px,transparent 1px 4px)}
-.deck-info{position:relative;z-index:1;min-width:0;display:flex;flex-direction:column;gap:4px;align-self:flex-end}
-.deck-info b{font:800 22px/1.1 var(--f-display);letter-spacing:-.02em;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.deck-info > span{font-size:13px;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.deck-info a{margin-top:6px;font-size:12px;font-weight:700;color:var(--ink);text-decoration:none;opacity:.8;white-space:nowrap}
-.deck-info a:hover{opacity:1;text-decoration:underline}
-.clip{align-self:flex-start;margin-bottom:6px;background:rgba(11,10,20,.6);backdrop-filter:blur(8px);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:4px 11px;font-variant-numeric:tabular-nums;display:flex;gap:6px;align-items:center}
-.clip::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--hot);box-shadow:0 0 10px var(--hot)}
-.deck-prog{position:absolute;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.1);z-index:2}
-.deck-prog i{display:block;height:100%;width:0;background:var(--grad)}
-.stage{position:relative;background:var(--glass);border:1px solid var(--stroke);border-radius:26px;padding:18px 22px 16px;display:flex;flex-direction:column;gap:10px;min-width:0;
-  backdrop-filter:blur(24px) saturate(1.3);-webkit-backdrop-filter:blur(24px) saturate(1.3)}
-.st-top{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.pill{font-size:11.5px;font-weight:700;letter-spacing:.04em;border-radius:999px;padding:3px 10px;background:var(--glass-2);color:var(--soft)}
-.pill.band{background:var(--grad);color:#1A0C14}
-.st-top .no{margin-left:auto;font-size:12px;font-weight:700;color:var(--dim);font-variant-numeric:tabular-nums}
-.st-word{margin:2px 0 0;font:800 clamp(36px,3.6vw,50px)/.95 var(--f-display);letter-spacing:-.045em;overflow-wrap:anywhere}
-.st-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.st-ipa{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--stroke-2);background:transparent;border-radius:999px;padding:4px 12px 4px 10px;font:16px/1.4 var(--f-ipa);color:var(--soft);transition:background .2s,color .2s}
-.st-ipa:hover{background:var(--ink);color:var(--bg)}
-.st-mean{margin:0;font-size:17px;font-weight:700}
-.st-en{margin:-4px 0 0;color:var(--muted);font-size:14px}
-
-.lyrics{position:relative;height:190px;overflow:hidden;margin:4px -4px 0;padding:0 4px}
-.stage.live .lyrics{-webkit-mask-image:linear-gradient(transparent,#000 22%,#000 78%,transparent);mask-image:linear-gradient(transparent,#000 22%,#000 78%,transparent)}
-.lyrics-in{padding:6px 0;transition:transform .55s cubic-bezier(.3,.7,.3,1)}
-.stage.live .lyrics-in{padding:70px 0}
-/* lines wrap at 100%/1.06 so the current line, scaled by 1.06 from the left, still fits the box */
-.ln{cursor:pointer;max-width:calc(100% / 1.06);margin:0;padding:13px 0;font:700 20px/1.35 var(--f-display);letter-spacing:-.01em;color:var(--soft);isolation:isolate;transform-origin:left center;transition:transform .4s cubic-bezier(.3,.7,.3,1),opacity .4s,color .4s}
-.stage.live .ln{color:var(--dim)}
-@media (hover:hover){ .ln:hover{color:var(--ink)} .stage.live .ln:not(.cur):hover{color:var(--soft)} }
-.stage.live .ln.cur{color:var(--ink);transform:scale(1.06)}
-.stage.live .ln.past{color:var(--muted);opacity:.6}
-.lw{--p:0}
-.stage.live .ln.cur .lw:not(.tw):not(.xw){background:var(--grad) 0 0/calc(var(--p)*100%) 100% no-repeat,linear-gradient(var(--ink),var(--ink));-webkit-background-clip:text;background-clip:text;color:transparent}
-.tw{position:relative;white-space:nowrap;cursor:help;color:var(--hl-ink)!important;padding:0 .12em;margin:0 -.04em}
-.tw::before{content:"";position:absolute;inset:.1em -.02em .02em;background:var(--hl);border-radius:.28em .18em .32em .2em;transform:skew(-7deg) rotate(-1.2deg);z-index:-1;box-shadow:0 0 22px rgba(255,225,74,.35)}
-.stage.live .ln.cur .tw.hit::before{animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
-@keyframes pop{0%{transform:skew(-7deg) rotate(-1.2deg) scale(1)}45%{transform:skew(-7deg) rotate(-3deg) scale(1.18)}100%{transform:skew(-7deg) rotate(-1.2deg) scale(1)}}
-.lyr-msg{color:var(--muted);font-size:13px;padding:10px 0}
-
-.st-note{margin:0;font-size:13px;color:var(--soft)}
-.st-tip{font-size:13.5px;color:var(--soft);border:1px dashed var(--stroke-2);border-radius:14px;padding:9px 12px}
-.st-tip b{font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--amber);margin-right:8px}
-
-/* ---------- controls ---------- */
-.ctl{display:flex;align-items:center;gap:4px;background:var(--glass);border:1px solid var(--stroke);border-radius:999px;padding:8px 14px 8px 8px;
-  backdrop-filter:blur(24px) saturate(1.3);-webkit-backdrop-filter:blur(24px) saturate(1.3)}
-.ctl button{border:0;background:transparent;border-radius:999px;height:42px;min-width:42px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 10px;color:var(--soft);font-size:13px;font-weight:700;transition:background .15s,color .15s}
-.ctl button:hover{background:var(--glass-2);color:var(--ink)}
-.ctl .play{background:var(--grad);color:#1A0C14;width:54px;height:54px;box-shadow:0 8px 26px rgba(255,77,141,.45)}
-.ctl .play:hover{background:var(--grad);color:#1A0C14;transform:scale(1.05)}
-.ctl .tog[aria-pressed="true"],.ctl .tog[aria-pressed="true"]:hover{color:var(--hot);background:rgba(255,77,141,.16);box-shadow:inset 0 0 0 1px rgba(255,77,141,.35)}
-.ctl .time{margin-left:auto;font-size:12px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
-.hint{font-size:12px;color:var(--muted);margin:0;padding:0 8px}
-.hint kbd{font:600 11px var(--f-body);border:1px solid var(--stroke-2);border-bottom-width:2px;border-radius:5px;padding:0 5px;color:var(--soft)}
-.foot{grid-column:1;font-size:12px;color:var(--dim);border-top:1px solid var(--stroke);padding-top:16px;max-width:80ch}
-.carousel{display:none}
-.start{display:none}
-.browser-head{display:none;align-items:center;justify-content:space-between;margin-bottom:14px}
-.browser-head h2{margin:0;font:800 26px var(--f-display);letter-spacing:-.03em}
-.browser-head button{border:1px solid var(--stroke-2);background:var(--glass);border-radius:999px;padding:7px 15px;font-weight:700;font-size:13px}
-
-/* ---------- phone ---------- */
-@media (max-width:899px){
-  html{height:100%;overflow:hidden;overscroll-behavior:none}
-  body{overflow:hidden;display:flex;flex-direction:column;height:100%;position:fixed;inset:0;overscroll-behavior:none}
-  .top{padding:10px 16px;gap:10px;flex:none}
-  .logo h1{font-size:21px}
-  .tagline,.prog-bar{display:none}
-  .btn-list{display:inline-block;flex:none;white-space:nowrap}
-  .top .logo,.full-pill{flex:none}
-  #openList{display:inline-flex;align-items:center;gap:5px}
-  /* z-index:auto so the fixed word-list panel (z 40) can sit above the header (z 20) */
-  .app{display:flex;flex-direction:column;padding:0;flex:1;min-height:0;min-width:0;gap:0;width:100%;max-width:100vw;z-index:auto}
-  .aside{position:static;display:contents}
-  #deskStage,.hint,.foot{display:none}
-  .aside > .deck{flex:none;align-self:stretch;width:auto;margin:12px 16px 0;border-radius:22px;aspect-ratio:auto;height:132px;padding:14px;gap:14px}
-  .deck-info a .long{display:none}
-  .deck-info{align-self:center}
-  .deck-info b{font-size:18px}
-  .clip{margin-bottom:2px}
-  .browser{position:fixed;inset:0;z-index:40;background:var(--bg);overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 14px) 16px calc(env(safe-area-inset-bottom,0px) + 24px);display:none}
-  .browser.open{display:block}
-  /* word-list panel: the search row pins under the pinned title bar (47px of it stays visible) */
-  .browser .filters{top:47px;margin-inline:-16px;padding:10px 16px;border-radius:0}
-  .browser-head{display:flex;position:sticky;top:calc(-1 * (env(safe-area-inset-top,0px) + 12px));z-index:2;margin:0 -16px 12px;padding:calc(env(safe-area-inset-top,0px) + 12px) 16px 10px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-  .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
-  .card .w{font-size:21px}
-  .carousel{display:flex;flex:1;min-height:0;width:100%;min-width:0;max-width:100vw;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;
-    padding-bottom:calc(var(--ctl-h) + env(safe-area-inset-bottom,0px) + 8px)}
-  .carousel::-webkit-scrollbar{display:none}
-  .slide{flex:0 0 100%;scroll-snap-align:center;scroll-snap-stop:always;padding:12px 16px 4px;display:flex;overflow-y:auto}
-  .slide .stage{flex:1;padding:18px;gap:10px;min-height:100%;border-radius:24px}
-  .st-word{font-size:44px}
-  .slide .lyrics{height:auto;flex:1;min-height:150px}
-  .ln{font-size:19px}
-  .ctl{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:30;height:var(--ctl-h);padding:8px 12px 8px 10px;background:color-mix(in srgb,var(--bg) 70%,transparent)}
-  /* first-visit gate: blur everything behind it and put one obvious button in the middle */
-  .start{display:flex;position:fixed;inset:0;z-index:50;align-items:center;justify-content:center;padding:16px;cursor:pointer;
-    background:rgba(11,10,20,.45);backdrop-filter:blur(14px) saturate(1.1);-webkit-backdrop-filter:blur(14px) saturate(1.1)}
-  .start button{border:0;background:var(--grad);color:#1A0C14;border-radius:999px;padding:18px 32px;font-weight:800;font-size:19px;box-shadow:0 12px 36px rgba(255,77,141,.5);display:flex;flex-direction:column;align-items:center;gap:2px;animation:breathe 2.4s ease-in-out infinite}
-  @keyframes breathe{0%,100%{box-shadow:0 12px 36px rgba(255,77,141,.45),0 0 0 0 rgba(255,77,141,.35)}50%{box-shadow:0 12px 40px rgba(255,77,141,.6),0 0 0 14px rgba(255,77,141,0)}}
-  .start button small{font-weight:600;font-size:12px;opacity:.8;line-height:1.5;margin-top:2px}
-  .start-inner{display:flex;flex-direction:column;align-items:center;gap:10px}
-  .start-brand{display:flex;align-items:center;gap:10px}
-  .start-brand b{font:800 34px/1 var(--f-display);letter-spacing:-.03em;color:var(--ink)}
-  .start-brand b span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-  .start-brand .eq{height:24px}
-  .start-brand .eq i{width:5px}
-  .start-brand .eq i:nth-child(1){height:10px}.start-brand .eq i:nth-child(2){height:22px}.start-brand .eq i:nth-child(3){height:15px}.start-brand .eq i:nth-child(4){height:24px}
-  .start-tag{margin:0 0 14px;color:var(--soft);font-size:14px;font-weight:600;letter-spacing:.08em}
-}
-@media (max-width:420px){ .ctl .time{display:none} }
-/* iOS zooms the page when focusing a field whose text is under 16px; 16px keeps the layout still (pinch-zoom stays allowed) */
-@media (max-width:899px), (pointer:coarse){ input, select, textarea{font-size:16px!important} }
-@media (min-width:900px) and (max-height:800px){ .aside > .hint{display:none} }
-@media (prefers-reduced-motion:reduce){ *,*::before{animation:none!important;transition:none!important} }
-/* ---------- extra IELTS words in the lyrics ---------- */
-:root{--xw:var(--hot);--xw-edge:rgba(255,77,141,.5);--xw-ink:#FF7AA8}
-/* same highlighter shape and pop as the main word, in the site's pink-red (start of the player gradient), white text */
-.xw{position:relative;white-space:nowrap;cursor:help;padding:0 .12em;margin:0 -.04em;color:#FFFFFF!important}
-.xw::before{content:"";position:absolute;inset:.1em -.02em .02em;background:var(--xw);border-radius:.28em .18em .32em .2em;transform:skew(-7deg) rotate(-1.2deg);z-index:-1}
-.stage.live .ln.cur .xw.hit::before{animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
-/* label sits in the gap above the word's line (lines are spaced to make room); lives inside the scrolling lyrics */
-.lyrics-in{position:relative}
-.gloss{position:absolute;z-index:2;display:inline-flex;gap:5px;align-items:baseline;white-space:nowrap;pointer-events:none;
-  height:20px;padding:0 9px;border-radius:7px;background:rgba(22,19,34,.88);border:1px solid var(--xw-edge);font-size:13px;line-height:18px;color:var(--soft);
-  opacity:0;transform:translate(-50%,2px);transition:opacity .2s,transform .2s}
-.gloss.on{opacity:1;transform:translate(-50%,0)}
-.gloss b{font:700 13.5px/18px var(--f-display);color:var(--xw-ink)}
-.gloss.main{border-color:rgba(255,225,74,.5)}
-.gloss.main b{color:var(--hl)}
-.gloss i{font:13px/18px var(--f-ipa);font-style:normal;color:var(--muted)}
-.lyrics{isolation:isolate}
-/* ---------- full version: "want" counter + one-time survey ---------- */
-.want{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:16px 20px;border:1px solid var(--stroke);border-radius:18px;background:var(--glass)}
-.want b{font:800 17px var(--f-display);letter-spacing:-.01em}
-.want .grow{flex:1}
-.want-btn{height:40px;border:0;border-radius:999px;padding:0 18px;font-weight:800;font-size:14px;background:var(--grad);color:#1A0C14;display:inline-flex;align-items:center;gap:6px;box-shadow:0 6px 20px rgba(255,77,141,.35);transition:transform .15s}
-.want-btn:hover{transform:scale(1.04)}
-.want-btn[aria-pressed="true"]{background:var(--glass-2);color:var(--hot);box-shadow:none;cursor:default}
-.want-count{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
-.want-desk{grid-column:1}   /* left column only: the sticky player column would sit on top of anything wider */
-.want-mob{display:none;margin-top:18px}
-@media (max-width:899px){ .want-desk{display:none} .want-mob{display:flex} }   /* after the defaults above, so it wins */
-.survey{position:fixed;inset:0;z-index:55;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(6,5,12,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-.survey-card{position:relative;width:min(360px,100%);padding:28px 24px 22px;border-radius:24px;background:#181530;border:1px solid var(--stroke-2);box-shadow:0 24px 70px rgba(0,0,0,.6);text-align:center;display:flex;flex-direction:column;gap:12px}
-.survey-card h3{margin:0;font:800 24px var(--f-display);letter-spacing:-.02em}
-.survey-card p{margin:0;color:var(--soft);font-size:14px}
-.survey-list{margin:0;padding:0;list-style:none;display:grid;gap:6px;color:var(--soft);font-size:14px;text-align:left}
-.survey-list li::before{content:"♪ ";color:var(--hot)}
-.survey-actions{display:flex;gap:10px;justify-content:center;margin-top:6px}
-.survey-actions button{height:46px;flex:1;border-radius:999px;font-weight:800;font-size:15px;border:1px solid var(--stroke-2);background:var(--glass-2);color:var(--ink)}
-.survey-actions .want-btn{border:0;justify-content:center;background:var(--grad);color:#1A0C14;box-shadow:0 6px 20px rgba(255,77,141,.35)}
-.survey-x{position:absolute;top:10px;right:12px;width:32px;height:32px;border:0;border-radius:50%;background:transparent;color:var(--muted);font-size:20px;line-height:1}
-.survey-x:hover{background:var(--glass-2);color:var(--ink)}
-/* ---------- word bank ---------- */
-.card{content-visibility:auto;contain-intrinsic-size:auto 150px}
-.stage.swap-up{animation:swapUp .32s cubic-bezier(.2,.8,.2,1)}
-.stage.swap-down{animation:swapDown .32s cubic-bezier(.2,.8,.2,1)}
-@keyframes swapUp{from{opacity:0;transform:translateY(34%)}to{opacity:1;transform:none}}
-@keyframes swapDown{from{opacity:0;transform:translateY(-34%)}to{opacity:1;transform:none}}
-/* songs of this word: a vertical column of dots on the card's right edge (like story pagination) */
-.clip-dots{position:absolute;right:7px;top:50%;transform:translateY(-50%);z-index:4;display:flex;flex-direction:column;align-items:center;gap:6px}
-.clip-dot{width:6px;height:6px;padding:0;border:0;border-radius:3px;background:rgba(255,255,255,.28);transition:height .3s cubic-bezier(.3,.7,.3,1),background .3s}
-.clip-dot.on{height:20px;background:var(--grad)}
-.clip-dot::after{content:"";position:absolute;inset:-6px -10px}   /* bigger tap target */
-.clip-dot{position:relative}
-@media (hover:hover){ .clip-dot:not(.on):hover{background:rgba(255,255,255,.55)} }
-/* the part of the card that moves when changing song */
-.stage .swipe-body{will-change:transform,opacity}
-.loading{color:var(--muted);padding:40px 0;text-align:center;grid-column:1/-1}
-/* ---------- share ---------- */
-.st-share{border:1px solid var(--stroke-2);background:transparent;color:var(--soft);border-radius:50%;width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;transition:background .15s,color .15s}
-.st-share:hover{background:var(--ink);color:var(--bg)}
-.st-fav{font-size:15px;line-height:1}
-.st-fav[aria-pressed="true"]{color:var(--amber);border-color:var(--amber)}
-.st-fav[aria-pressed="true"]:hover{background:transparent;color:var(--amber)}
-.card.fav .no::before{content:"★ ";color:var(--amber)}
-.st-top .no{margin-left:auto}
-.sheet{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 16px);background:rgba(6,5,12,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-.sheet-card{display:flex;flex-direction:column;align-items:center;gap:14px;max-width:min(440px,100%);max-height:100%}
-.sheet-card img{display:block;max-width:100%;max-height:calc(100dvh - 190px);border-radius:18px;background:#15121F;
-  /* the poster is dark on a dark backdrop: a light hairline and soft halo keep its edge readable */
-  box-shadow:0 0 0 1px rgba(255,255,255,.22),0 0 0 6px rgba(255,255,255,.04),0 24px 70px rgba(0,0,0,.7)}
-.sheet-card .busy{color:var(--soft);font-size:14px;padding:40px}
-.sheet-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-.sheet-actions button{height:44px;border-radius:999px;padding:0 18px;font-weight:700;font-size:14px;border:1px solid var(--stroke-2);background:var(--glass-2);color:var(--ink)}
-.sheet-actions .primary{border:0;background:var(--grad);color:#1A0C14}
-.sheet-hint{margin:0;color:var(--muted);font-size:12px;text-align:center}
-.sheet-hint:empty{display:none}
-.sheet-hint{line-height:1.7}
-.sheet-hint.strong{font-size:15px;font-weight:700;color:var(--ink)}
-.sheet-hint small{font-size:12px;font-weight:500;color:var(--muted)}
-@media (max-width: 400px){ .prog-word{display:none} }
-</style>
+<link rel="stylesheet" href="./css/base.css?v=p51">
+  <link rel="stylesheet" href="./css/auth.css?v=p51">
+  <link rel="stylesheet" href="./css/profile.css?v=p51">
+  <link rel="stylesheet" href="./css/home.css?v=p51">
 </head>
 <body>
 <div class="ambient" aria-hidden="true"><i id="artA"></i><i id="artB"></i></div>
 
 <header class="top">
-  <div class="logo"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><h1>Sing<span>lish</span></h1></div><button type="button" class="full-pill" id="openFull" data-umami-event="full-pill" data-umami-event-from="button">完整版</button>
-  <p class="tagline">听歌记单词 · 每个雅思词都藏在一段流行歌里</p>
+  <div class="logo"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><h1>Sing<span>lish</span></h1></div>
+  <p class="tagline">听歌记单词 · 每个考词都藏在一段流行歌里</p>
   <div class="grow"></div>
-  <div class="prog"><div class="prog-bar"><i id="progFill"></i></div><span><b id="doneCount">0</b> / <span id="totalCount">100</span><span class="prog-word"> 已唱</span></span></div>
-  <button class="btn-list" id="openList" type="button" aria-label="切换词表"><span id="listName">全部</span><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+  <div class="prog"><div class="prog-bar"><i id="progFill"></i></div><span><b id="doneCount">0</b> / <span id="totalCount">1571</span><span class="prog-word"> 已唱</span></span></div>
+  <button type="button" class="btn-auth" id="authBtn" hidden>登录</button>
 </header>
 
 <main class="app">
@@ -362,16 +53,27 @@ body.is-playing .deck-cd{animation-play-state:running}
       </div>
     </div>
     <p class="count" id="countLine"></p>
+    <!-- 游客 20 词限制提示（docs/guest-mode.md §2，2026-09-29 增补；2026-09-30 全量切换后总数改运行时口径，文案不再烙死总数）：仅 body.guest 露出（css/base.css），登录态/完整模式不渲染感知 -->
+    <p class="count guest-note">游客可见 20 词，登录解锁全部</p>
     <div class="grid" id="grid"></div>
-    <div class="want want-mob"><b>完整版，敬请期待</b><span class="grow"></span><button type="button" class="want-btn" data-want aria-pressed="false">♥ 想要</button><span class="want-count" data-want-count></span></div>
   </section>
 
   <aside class="aside">
+    <!-- 词为中心（用户 2026-09-28 定调）：词卡+歌词先露脸，歌曲信息（deck）随后，播放器收底 -->
+    <div id="deskStage"></div>
+    <!-- 会话键行（docs/learn-mode.md §4）：歌词与歌曲横幅之间，学习/复习同构两键（P8 2026-10-01 用户定调：
+         复习态「跳过」也删掉，下一词统一承担——未答点它=跳过语义（复习闪释义不计分/学习不计学绕回），
+         答完点它=实际下一词；「答题」未答时=立即出题，答完待前进态=等同下一词）；
+         门题/测验答后 600/1200ms 染色即收卡回词面，弹层内不放前进钮（#quizNext 仅学习 recap 用）；
+         模式类互斥由 js 保证（setMode/setLearnBody 启动互清，P5） -->
+    <div class="review-ops" id="reviewOps">
+      <button type="button" class="rev-op" id="rvKnow" title="答题——不等唱完，直接出题">答题</button>
+      <button type="button" class="rev-op" id="rvNext" title="下一词——没答的词跳过稍后再遇，答完的词正常前进">下一词</button>
+    </div>
     <div class="deck" id="deck"><div class="deck-bg" id="deckBg"></div>
       <div class="deck-cd"><img id="deckArt" alt=""></div>
       <div class="deck-info"><span class="clip" id="clipTag">30 秒试听</span><b id="deckTitle"></b><span id="deckArtist"></span><a id="deckLink" href="#" target="_blank" rel="noopener"><span class="long">在 </span>Apple Music<span class="long"> 听完整首</span> ↗</a></div>
       <div class="deck-prog"><i id="deckProg"></i></div></div>
-    <div id="deskStage"></div>
     <div class="ctl" id="ctl">
       <button type="button" class="play" id="play" aria-label="播放"><svg id="icoPlay" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 4.8v14.4c0 .8.9 1.3 1.6.8l11-7.2a1 1 0 0 0 0-1.6l-11-7.2C8.9 3.5 8 4 8 4.8z"/></svg><svg id="icoPause" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" hidden><rect x="6" y="4" width="4.5" height="16" rx="1.5"/><rect x="13.5" y="4" width="4.5" height="16" rx="1.5"/></svg></button>
       <button type="button" id="prev" aria-label="上一个" title="上一个"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="2.6" height="14" rx="1.2"/><path d="M19 6.2v11.6c0 .8-.9 1.3-1.6.8L9.6 13.3a1.5 1.5 0 0 1 0-2.6l7.8-5.3c.7-.5 1.6 0 1.6.8z"/></svg></button>
@@ -381,21 +83,323 @@ body.is-playing .deck-cd{animation-play-state:running}
       <button type="button" class="tog" id="loop" aria-pressed="false" aria-label="单曲循环" title="单曲循环"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l3 3-3 3"/><path d="M4 11V9a4 4 0 0 1 4-4h12"/><path d="M7 22l-3-3 3-3"/><path d="M20 13v2a4 4 0 0 1-4 4H4"/><path d="M11 10.2l1.6-1.2v6" stroke-width="2"/></svg></button>
       <span class="time" id="time">0:00 / 0:00</span>
     </div>
+    <!-- 情境化会话条 (docs/learn-mode.md §3 + docs/home-page.md): hidden until js/learn.js reveals it on login.
+         单行：[←] 学习/复习 x/y [按钮]，进度收成卡片背景填充宽度（#learnProg 全高底衬）；
+         复习入口只在首页。左侧 [←] 回首页 -->
+    <div class="learn-row" id="learnRow" hidden>
+      <button type="button" class="home-back" id="homeBack" aria-label="返回首页" title="返回首页"><svg width="16" height="16" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M224 128H48"/><path d="m88 168-40-40 40-40"/></svg></button>
+      <span class="learn-status" id="learnStatus"></span><button type="button" class="learn-btn" id="learnBtn" hidden>学习</button>
+      <i id="learnProg"></i>
+    </div>
     <p class="hint">点卡片就开唱 · <kbd>←</kbd> <kbd>→</kbd> 换词 · <kbd>↑</kbd> <kbd>↓</kbd> 换歌 · <kbd>空格</kbd> 暂停</p>
   </aside>
 
   <div class="carousel" id="carousel" aria-label="左右滑动切换单词"></div>
+  <!-- W4（2026-09-30 工单）：移动端词卡轮播的回首页按钮（iteration_1 W2：裸文本 × 改内联 Phosphor
+       arrow-left SVG，与 #homeBack 同图标族，findings B3）。
+       游客点词卡进轮播后，会话条 [←]（#learnRow）只在登录态露出，游客唯一的回首页路径是点品牌
+       logo——不可发现、无提示。本钮仅「移动断点 + 会话外（learnRow 隐藏）」时露出（js/app.js 开关），
+       点击与 logo 同语义：派 'stw:home-open' 让 home.js 开首页（learn/review 也会借此收场）。
+       桌面不渲染（轮播本身是移动端专属），会话内不渲染（已有 [←]，两个返回钮是噪音）。
+       位置：左上角贴头部下方——右上角被卡片 [☆][分享] 占住，左上是「回上一页」的常规位。 -->
+  <button type="button" class="carousel-x" id="carouselClose" hidden aria-label="返回首页" title="返回首页"><svg width="18" height="18" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M224 128H48"/><path d="m88 168-40-40 40-40"/></svg><span class="carousel-x-label">词库</span></button>
 
-  <div class="want want-desk"><b>完整版，敬请期待</b><span class="grow"></span><button type="button" class="want-btn" data-want aria-pressed="false">♥ 想要</button><span class="want-count" data-want-count></span></div>
   <p class="foot">歌曲片段为 Apple Music 官方 30 秒试听，逐行时间轴歌词实时取自 LRCLIB 公共歌词库，词曲版权归原作者及唱片公司。每个片段只截取唱到目标词的前后几句，逐词高亮按试听音频里的实际演唱时间同步。</p>
 </main>
 
-<div class="survey" id="survey" hidden role="dialog" aria-modal="true" aria-labelledby="surveyTitle">
-  <div class="survey-card">
-    <button type="button" class="survey-x" id="surveyClose" aria-label="关闭">×</button>
-    <h3 id="surveyTitle">完整版，敬请期待</h3>
-    <ul class="survey-list"><li>覆盖更多字典</li><li>打卡 / 复习</li><li>曲风偏好</li><li>跟唱模式</li></ul>
-    <div class="survey-actions"><button type="button" class="want-btn" data-want>♥ 想要</button><button type="button" id="surveyMeh">一般般</button></div>
+<!-- home view (docs/home-page.md §0/§2): 每日任务流首页——问候 / streak / 学习·复习双主卡 / 计划行 / 逛词库出口。
+     与 .browser 面板同机制的全屏视图：默认 display:none，.open 显示（css/home.css）；
+     z-index 45——高于内容（header 20 / 播放器 30 / 词表面板 40），低于 .auth 弹层（56）。
+     本块只出骨架，接线在 js/home.js（后续阶段）：id 即契约，改一个字母就断一条腿 -->
+<section class="home" id="homeView" aria-label="首页">
+  <div class="home-in">
+
+    <!-- 精简头：logo（点击关首页，接线在 home.js）+ 登录位。#homeAuth 是占位——home.js 往里放
+         登录入口或留白；不复制 #authBtn，全页 id 唯一 -->
+    <header class="home-head">
+      <div class="home-logo"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><b>Sing<span>lish</span></b></div>
+      <span class="home-auth" id="homeAuth"></span>
+    </header>
+
+    <!-- 问候行（按时段 + 日期）与 streak 行：home.js 填文案，纯文字无 emoji -->
+    <p class="home-hello" id="homeGreet"></p>
+    <p class="home-streak" id="homeStreak"></p>
+
+    <!-- 双主卡：等宽两列、≤599px 纵向堆叠（css/home.css）；学习卡带今日进度条，
+         .learn-prog 直接复用 css/profile.css 的渐变配方，#homeLearnProg 是其中的渐变 i。
+         按钮权重（2026-09-29 定调反转：待办的高于已完成的）：渐变主钮 is-grad 摆在复习卡的
+         [开始复习] 上，学习卡 [再学 N 词]（已达标态）用描边弱钮——静态摆放，js 不切。
+         学习计划并入学习卡（2026-10-02 用户需求：两处割裂）——发丝线分隔的脚注行
+         （#homePlanRow：计划文案 + [修改]；无计划整行收成 [设置学习计划] 渐变钮，js/home.js 切），
+         点击经 onPlan stopPropagation 隔离，不冒泡成学习卡的开始学习 -->
+    <div class="home-cards">
+      <div class="home-card" id="homeLearnCard">
+        <span class="home-card-label">学习</span>
+        <p class="home-learn-num" id="homeLearnStatus">今日 -- 词</p>
+        <div class="learn-prog"><i id="homeLearnProg"></i></div>
+        <!-- W3（2026-09-30 工单）：超额副行——done > goal 时「已超额 N 词」，主数字已封顶到 goal/goal；
+             hidden 由 home.js 切，无超额时整行不占位（零位移） -->
+        <p class="home-learn-over" id="homeLearnOver" hidden></p>
+        <button type="button" class="home-card-btn" id="homeLearnBtn">开始学习</button>
+        <div class="home-plan" id="homePlanRow">
+          <span class="home-plan-k">学习计划</span>
+          <span class="home-plan-text" id="homePlanText"></span>
+          <button type="button" class="home-plan-btn" id="homePlanEdit">修改</button>
+          <button type="button" class="home-plan-btn" id="homePlanSet" hidden>设置学习计划</button>
+        </div>
+      </div>
+      <div class="home-card" id="homeReviewCard">
+        <span class="home-card-label">复习</span>
+        <p class="home-review-num"><b id="homeReviewNum">--</b><span>词待巩固</span></p>
+        <!-- W1（2026-09-30 工单）：复习卡 0 待巩固时的次级预览——P3 SRS 把新词 next_due 播种到明天，
+             当天刚学的词不在复习池里，复习卡只剩「0」会让用户以为"我没学到东西"。本行补一句
+             「今日新增 N · 明日可复习」，把「学过了、明天来巩固」讲清楚。hidden 由 home.js 切 -->
+        <p class="home-review-new" id="homeReviewNew" hidden></p>
+        <button type="button" class="home-card-btn is-grad" id="homeReviewBtn" hidden>开始复习</button>
+      </div>
+    </div>
+
+    <!-- 词库进度 + 打卡热力（2026-10-02 用户需求，二轮合并）：一张卡两段——上段圆环（词库已学/总数），
+         发丝线分隔下段打卡热力抽屉（默认收起，#hmToggle 点击展开/收回，.is-open 切 grid-template-rows
+         0fr/1fr 抽屉动画，chevron 旋转），累计打卡天数常驻收起的小横条上；展开后点格子，#hmDetail
+         在网格下方内嵌出当天详情条（学习/复习词数）。数值全由 js/home-viz.js 渲染：圆环 = #ringBar 的
+         stroke-dashoffset，格子全由 #hmGrid 空壳生成；游客/未登录整卡隐藏 -->
+    <div class="home-viz is-column hm" id="homeViz" hidden>
+      <div class="ring-row">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 72 72" width="76" height="76" aria-hidden="true">
+            <defs>
+              <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#FF4D8D"/><stop offset=".55" stop-color="#FF7A59"/><stop offset="1" stop-color="#FFB547"/>
+              </linearGradient>
+            </defs>
+            <circle class="ring-track" cx="36" cy="36" r="31"></circle>
+            <circle class="ring-bar" id="ringBar" cx="36" cy="36" r="31" transform="rotate(-90 36 36)"></circle>
+          </svg>
+          <b class="ring-pct" id="ringPct">--</b>
+        </div>
+        <div class="ring-info">
+          <span class="home-card-label">词库进度</span>
+          <p class="ring-sub" id="ringSub">--</p>
+          <p class="ring-dict" id="ringDict"></p>
+        </div>
+      </div>
+      <button type="button" class="hm-head" id="hmToggle" aria-expanded="false" aria-controls="hmBody">
+        <span class="home-card-label">打卡热力</span>
+        <span class="hm-head-r"><span class="hm-checkins" id="hmCheckins"></span><span class="hm-hint">近 17 周</span><svg class="hm-chev" width="14" height="14" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m216 88-80 80-80-80"/></svg></span>
+      </button>
+      <div class="hm-body" id="hmBody">
+        <div class="hm-body-in">
+          <div class="hm-grid" id="hmGrid"></div>
+          <div class="hm-detail" id="hmDetail" hidden aria-live="polite"></div>
+          <div class="hm-legend">少<i data-l="1"></i><i data-l="2"></i><i data-l="3"></i><i data-l="4"></i><i data-l="5"></i>多</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 计划行已并入学习卡（见 home-cards 注释） -->
+
+
+    <!-- 幽灵链接：浏览词库=关首页→词表网格面板（原头部右上角入口，用户 2026-09-28 定调迁入首页，
+         面板开关归 app.js 的 __stwOpenList 钩子；面板[关闭]经 stw:list-close 回首页，词卡点击则留在轮播） -->
+    <button type="button" class="home-browse" id="homeList">浏览词库 →</button>
+
+  </div>
+</section>
+
+<!-- auth: 用户名+密码登录/注册弹层（docs/auth-userpass.md）；行为在 js/auth.js。
+     novalidate 关掉 HTML5 原生约束校验（英文气泡先于 submit 拦截），中文行内错误全交 auth.js；
+     用户名输入关自动大写/纠错/拼写检查（规则 ^[a-z0-9_]{3,20}$，大写会被静默拒绝） -->
+<div class="auth" id="authModal" hidden role="dialog" aria-modal="true" aria-label="登录 / 注册">
+  <div class="auth-card">
+    <div class="auth-tabs-row">
+      <div class="auth-tabs" id="authTabs" role="tablist" aria-label="登录或注册">
+        <button type="button" class="auth-tab" id="authTabLogin" role="tab" aria-selected="true" aria-controls="authLoginForm">登录</button>
+        <button type="button" class="auth-tab" id="authTabRegister" role="tab" aria-selected="false" aria-controls="authRegisterForm">注册</button>
+      </div>
+      <button type="button" class="auth-x" id="authClose" aria-label="关闭">×</button>
+    </div>
+    <form id="authLoginForm" role="tabpanel" aria-labelledby="authTabLogin" novalidate hidden>
+      <p class="auth-why" id="authWhy" hidden></p>
+      <input class="auth-input" id="authLoginUser" name="username" type="text" maxlength="20" required placeholder="用户名" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <div class="auth-pass-wrap">
+        <input class="auth-input" id="authLoginPass" name="password" type="password" required placeholder="密码" autocomplete="current-password" enterkeyhint="go">
+        <button type="button" class="auth-eye" data-eye="authLoginPass" aria-label="显示密码" aria-pressed="false"><svg class="i-eye" viewBox="0 0 256 256" aria-hidden="true" fill="currentColor"><path d="M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.47,133.47,0,0,1,25,128,133.33,133.33,0,0,1,48.07,97.25C70.33,75.19,97.22,64,128,64s57.67,11.19,79.93,33.25A133.46,133.46,0,0,1,231.05,128C223.84,141.46,192.43,192,128,192Zm0-112a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Z"/></svg><svg class="i-eye-off" viewBox="0 0 256 256" aria-hidden="true" fill="currentColor" hidden><path d="M53.92,34.62A8,8,0,1,0,42.08,45.38L61.32,66.55C25,88.84,9.38,123.2,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208a127.11,127.11,0,0,0,52.07-10.83l22,24.21a8,8,0,1,0,11.84-10.76Zm47.33,75.84,41.67,45.85a32,32,0,0,1-41.67-45.85ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.16,133.16,0,0,1,25,128c4.69-8.79,19.66-33.39,47.35-49.38l18,19.75a48,48,0,0,0,63.66,70l14.73,16.2A112,112,0,0,1,128,192Zm6-95.43a8,8,0,0,1,3-15.72,48.16,48.16,0,0,1,38.77,42.64,8,8,0,0,1-7.22,8.71,6.39,6.39,0,0,1-.75,0,8,8,0,0,1-8-7.26A32.09,32.09,0,0,0,134,96.57Zm113.28,34.69c-.42.94-10.55,23.37-33.36,43.8a8,8,0,1,1-10.67-11.92A132.77,132.77,0,0,0,231.05,128a133.15,133.15,0,0,0-23.12-30.77C185.67,75.19,158.78,64,128,64a118.37,118.37,0,0,0-19.36,1.57A8,8,0,1,1,106,49.79,134,134,0,0,1,128,48c34.88,0,66.57,13.26,91.66,38.35,18.83,18.83,27.3,37.62,27.65,38.41A8,8,0,0,1,247.31,131.26Z"/></svg></button>
+      </div>
+      <button type="submit" class="auth-btn" id="authLoginBtn">登录</button>
+      <p class="auth-err" id="authErrLogin" role="alert"></p>
+    </form>
+    <form id="authRegisterForm" role="tabpanel" aria-labelledby="authTabRegister" novalidate hidden>
+      <p class="auth-hint" id="authRegHint">小写字母/数字/下划线 3-20 位 · 密码至少 6 位</p>
+      <input class="auth-input" id="authRegUser" name="username" type="text" maxlength="20" required placeholder="用户名" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <div class="auth-pass-wrap">
+        <input class="auth-input" id="authRegPass" name="newpass" type="password" required placeholder="设置密码（至少 6 位）" autocomplete="new-password">
+        <button type="button" class="auth-eye" data-eye="authRegPass" aria-label="显示密码" aria-pressed="false"><svg class="i-eye" viewBox="0 0 256 256" aria-hidden="true" fill="currentColor"><path d="M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.47,133.47,0,0,1,25,128,133.33,133.33,0,0,1,48.07,97.25C70.33,75.19,97.22,64,128,64s57.67,11.19,79.93,33.25A133.46,133.46,0,0,1,231.05,128C223.84,141.46,192.43,192,128,192Zm0-112a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Z"/></svg><svg class="i-eye-off" viewBox="0 0 256 256" aria-hidden="true" fill="currentColor" hidden><path d="M53.92,34.62A8,8,0,1,0,42.08,45.38L61.32,66.55C25,88.84,9.38,123.2,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208a127.11,127.11,0,0,0,52.07-10.83l22,24.21a8,8,0,1,0,11.84-10.76Zm47.33,75.84,41.67,45.85a32,32,0,0,1-41.67-45.85ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.16,133.16,0,0,1,25,128c4.69-8.79,19.66-33.39,47.35-49.38l18,19.75a48,48,0,0,0,63.66,70l14.73,16.2A112,112,0,0,1,128,192Zm6-95.43a8,8,0,0,1,3-15.72,48.16,48.16,0,0,1,38.77,42.64,8,8,0,0,1-7.22,8.71,6.39,6.39,0,0,1-.75,0,8,8,0,0,1-8-7.26A32.09,32.09,0,0,0,134,96.57Zm113.28,34.69c-.42.94-10.55,23.37-33.36,43.8a8,8,0,1,1-10.67-11.92A132.77,132.77,0,0,0,231.05,128a133.15,133.15,0,0,0-23.12-30.77C185.67,75.19,158.78,64,128,64a118.37,118.37,0,0,0-19.36,1.57A8,8,0,1,1,106,49.79,134,134,0,0,1,128,48c34.88,0,66.57,13.26,91.66,38.35,18.83,18.83,27.3,37.62,27.65,38.41A8,8,0,0,1,247.31,131.26Z"/></svg></button>
+      </div>
+      <div class="auth-pass-wrap">
+        <input class="auth-input" id="authRegPass2" name="newpass2" type="password" required placeholder="确认密码" autocomplete="new-password" enterkeyhint="go">
+        <button type="button" class="auth-eye" data-eye="authRegPass2" aria-label="显示密码" aria-pressed="false"><svg class="i-eye" viewBox="0 0 256 256" aria-hidden="true" fill="currentColor"><path d="M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.47,133.47,0,0,1,25,128,133.33,133.33,0,0,1,48.07,97.25C70.33,75.19,97.22,64,128,64s57.67,11.19,79.93,33.25A133.46,133.46,0,0,1,231.05,128C223.84,141.46,192.43,192,128,192Zm0-112a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Z"/></svg><svg class="i-eye-off" viewBox="0 0 256 256" aria-hidden="true" fill="currentColor" hidden><path d="M53.92,34.62A8,8,0,1,0,42.08,45.38L61.32,66.55C25,88.84,9.38,123.2,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208a127.11,127.11,0,0,0,52.07-10.83l22,24.21a8,8,0,1,0,11.84-10.76Zm47.33,75.84,41.67,45.85a32,32,0,0,1-41.67-45.85ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.16,133.16,0,0,1,25,128c4.69-8.79,19.66-33.39,47.35-49.38l18,19.75a48,48,0,0,0,63.66,70l14.73,16.2A112,112,0,0,1,128,192Zm6-95.43a8,8,0,0,1,3-15.72,48.16,48.16,0,0,1,38.77,42.64,8,8,0,0,1-7.22,8.71,6.39,6.39,0,0,1-.75,0,8,8,0,0,1-8-7.26A32.09,32.09,0,0,0,134,96.57Zm113.28,34.69c-.42.94-10.55,23.37-33.36,43.8a8,8,0,1,1-10.67-11.92A132.77,132.77,0,0,0,231.05,128a133.15,133.15,0,0,0-23.12-30.77C185.67,75.19,158.78,64,128,64a118.37,118.37,0,0,0-19.36,1.57A8,8,0,1,1,106,49.79,134,134,0,0,1,128,48c34.88,0,66.57,13.26,91.66,38.35,18.83,18.83,27.3,37.62,27.65,38.41A8,8,0,0,1,247.31,131.26Z"/></svg></button>
+      </div>
+      <button type="submit" class="auth-btn" id="authRegBtn">注册</button>
+      <p class="auth-err" id="authErrReg" role="alert"></p>
+    </form>
+  </div>
+</div>
+
+<!-- profile card (docs/user-profile.md §3.2); behavior lives in js/profile.js -->
+<div class="auth" id="profileModal" hidden role="dialog" aria-modal="true" aria-label="个人资料">
+  <div class="auth-card profile-card">
+    <button type="button" class="auth-x" id="profileClose" aria-label="关闭">×</button>
+    <span class="profile-avatar" id="profileAvatar" aria-hidden="true"></span>
+    <div class="profile-field"><span class="profile-label">头像 · 选一个音乐风格</span><div class="avatar-picker" id="profilePicker" role="radiogroup" aria-label="选择音乐风格头像"></div></div>
+    <form id="profileForm">
+      <label class="profile-field" for="profileName"><span class="profile-label">用户名</span>
+        <input class="auth-input" id="profileName" type="text" maxlength="20" autocomplete="nickname" placeholder="">
+      </label>
+      <div class="profile-field"><span class="profile-label">登录名</span><p class="profile-mail" id="profileMail"></p></div>
+      <button type="submit" class="auth-btn" id="profileSave">保存</button>
+      <p class="auth-err" id="profileErr" role="alert"></p>
+    </form>
+    <div class="profile-logout-row"><button type="button" class="profile-alt" id="profileLogout">退出登录</button><button type="button" class="profile-alt" id="profileLogoutCancel" hidden>取消</button></div>
+  </div>
+</div>
+
+<!-- guest mode: one-time welcome modal (docs/guest-mode.md §3); behavior lives in the auth script block below -->
+<div class="auth" id="welcomeModal" hidden role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+  <div class="auth-card">
+    <button type="button" class="auth-x" id="welcomeClose" aria-label="关闭">×</button>
+    <h3 id="welcomeTitle">欢迎来到 Singlish</h3>
+    <p>听歌记单词 · 每个考词都藏在一段流行歌里</p>
+    <button type="button" class="auth-btn" id="welcomeLogin">注册 / 登录<small class="welcome-sub">全部单词 · 保存进度 · 复习</small></button>
+    <button type="button" class="auth-alt welcome-skip" id="welcomeSkip">先随便看看<small class="welcome-sub">体验 20 个单词，不保存记录</small></button>
+  </div>
+</div>
+
+<!-- learn plan setup (docs/learn-mode.md §3 W2): chips/goal highlight + stw:plan-save dispatch live in js/app.js, the plan upsert in js/learn.js -->
+<div class="auth" id="planSetupModal" hidden role="dialog" aria-modal="true" aria-label="设置学习计划">
+  <div class="auth-card">
+    <button type="button" class="auth-x" id="planSetupClose" aria-label="关闭">×</button>
+    <div class="auth-step" id="planStepPlan">
+      <h3 tabindex="-1">设置学习计划</h3>
+      <div class="plan-field"><span class="plan-label">选字典</span>
+        <div class="plan-chips" id="planChips" role="group" aria-label="选择学习字典">
+          <button type="button" class="plan-chip" data-dict="all" aria-pressed="true">全部</button>
+          <button type="button" class="plan-chip" data-dict="ielts" aria-pressed="false">雅思</button>
+          <button type="button" class="plan-chip" data-dict="cet4" aria-pressed="false">四级</button>
+          <button type="button" class="plan-chip" data-dict="cet6" aria-pressed="false">六级</button>
+          <button type="button" class="plan-chip" data-dict="toefl" aria-pressed="false">托福</button>
+        </div>
+      </div>
+      <div class="plan-field"><span class="plan-label">每日词数</span>
+        <div class="goal-opts" id="planGoals" role="group" aria-label="每日学习词数">
+          <button type="button" class="goal-opt" data-goal="5" aria-pressed="false">5 词</button>
+          <button type="button" class="goal-opt" data-goal="10" aria-pressed="true">10 词</button>
+          <button type="button" class="goal-opt" data-goal="15" aria-pressed="false">15 词</button>
+          <button type="button" class="goal-opt" data-goal="20" aria-pressed="false">20 词</button>
+        </div>
+      </div>
+      <button type="button" class="auth-secondary" id="planSaveOnly">保存学习计划</button>
+      <button type="button" class="auth-btn" id="planStart">保存并开始学习</button>
+    </div>
+    <div class="auth-step" id="planStepProfile" hidden>
+      <h3 tabindex="-1">完善个人资料</h3>
+      <p class="plan-sub">选一个音乐风格头像、起个名字，报告里就用它称呼你</p>
+      <div class="avatar-picker" id="planAvatarPicker" role="radiogroup" aria-label="选择音乐风格头像"></div>
+      <input class="auth-input" id="planName" type="text" maxlength="20" autocomplete="nickname" placeholder="">
+      <button type="button" class="auth-btn" id="planGo">开始学习</button>
+      <button type="button" class="auth-secondary" id="planSkip">跳过，直接开始学习</button>
+    </div>
+  </div>
+</div>
+
+<!-- daily check-in card (docs/learn-mode.md §3 W2): the two buttons dispatch stw:checkin-extra / stw:checkin-exit (js/app.js), the flow lives in js/learn.js.
+     B5（2026-09-30 工单 P2）：「组」概念已退役，按钮文案改「再学 N 词」（N = daily_goal，js/app.js 收到
+     stw:checkin-done 时按 detail.goal 动态覆写；此处 10 只是静态初值） -->
+<div class="auth" id="checkinModal" hidden role="dialog" aria-modal="true" aria-label="今日打卡完成">
+  <div class="auth-card">
+    <h3>今日打卡完成</h3>
+    <p class="checkin-stats" id="checkinStats"></p>
+    <button type="button" class="auth-btn" id="checkinExtra">再学 10 词</button>
+    <button type="button" class="auth-alt" id="checkinExit">退出</button>
+  </div>
+</div>
+
+<!-- review quiz modal (docs/learn-mode.md §4 W3): 30s 试听唱完弹四选一"这个词的意思是？"；
+     js/review.js 派 'stw:quiz-show' {word, options} → app.js 把词写进 #quizWord、把 4 个
+     button.quiz-opt 填进 #quizOpts（本块只出骨架，接线在 app.js 侧的后续阶段）。
+     P1→P4（2026-10-01 掌控感工单定稿）：学习门答后 600/1200ms 染色即收卡（前进在键行「下一词」）；
+     复习测验同款收卡，前进并入复习键行（答完词后 答题/跳过/重学 都向前，答题=主前进）；
+     #quizNext 仅学习 recap 回炉用（弹层停留款）-->
+<div class="auth" id="quizModal" hidden tabindex="-1" role="dialog" aria-modal="true" aria-label="词汇测验：选出这个词的意思">
+  <div class="auth-card">
+    <b class="quiz-word" id="quizWord"></b>
+    <p class="quiz-ask">这个词的意思是？</p>
+    <div class="quiz-opts" id="quizOpts" role="group" aria-label="四个释义选项"></div>
+    <button type="button" class="auth-btn" id="quizNext" hidden>下一词</button>
+  </div>
+</div>
+
+<!-- flashback challenge card (qa_journey_user_view_0930/flashback/REQ.md)：学习会话内每 2 词计学后的
+     听音辨词形小卡——侧滑入场、必答（无关闭钮、点卡片外不关闭）。
+     P14（2026-10-01 用户定调）：触发时机改在「下一词」点击——点下一词一般直接跳，攒到闪回点则先弹卡、
+     答完才放行到下一词；重播自然播完的自动推进不抽闪回（advanceAfterGate(drainFlash) 分流）。
+     P15：弹卡即派 stw:stop 停主音轨（点击时机可在片段播放中，双音轨重叠）——
+     与 #quizModal 明确区分（不套 .auth 全屏类）；选项复用 button.quiz-opt（与 U1 同款染色/风格）；
+     多 clip 词答后 #flashFrom 露出「来自另一首：歌名」。接线：js/flashback.js 派 stw:flash-*，
+     js/wiring.js 填 #flashOpts 与染色。
+     F2（2026-10-01 用户反馈）：播完整片段（不再 2s 截停；三改定调与词卡同窗口——逐 clip 复刻
+     L.start−1.2s → 下行尾+0.4s、≤20s、≤试听尾的双截断，音频到窗尾自动停）；左上角喇叭位即重播钮（点按重听，
+     二次定调：独立胶囊丑，收进喇叭位）；答后 #flashLyric 在选项上方亮歌词行（目标词 .xw 粉底
+     高亮与歌词页同款；取含目标词的最近歌词行，间奏空行不误选） -->
+<div class="flash" id="flashModal" hidden tabindex="-1" role="dialog" aria-modal="true" aria-label="闪回挑战：听音选出刚听的词">
+  <div class="flash-card">
+    <p class="quiz-tag" id="flashTag" hidden>闪回胶囊</p>
+    <button type="button" class="flash-ico flash-replay" id="flashReplay" title="重播——没听清就再来一遍"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5.5 6.8 9H3.8v6h3l4.2 3.5v-13z" fill="currentColor" stroke="none"/><path d="M15.5 9.2a4 4 0 0 1 0 5.6"/><path d="M18.4 6.4a8 8 0 0 1 0 11.2"/></svg></button>
+    <p class="flash-ask" id="flashAsk">刚听的这个词是？</p>
+    <p class="flash-lyric" id="flashLyric" hidden></p>
+    <div class="quiz-opts" id="flashOpts" role="group" aria-label="四个词形选项"></div>
+    <p class="flash-from" id="flashFrom" hidden></p>
+  </div>
+</div>
+
+<!-- review reveal card (docs/learn-mode.md §4 手动三键)：[重学]/[跳过] 立刻亮释义——词 + 释义一行，
+     1.8s 后 review.js 派 stw:quiz-close 收卡前进（app.js 同一监听收 quiz 与 reveal）。
+     W5（2026-09-30 工单，AC-A5）：本层无任何可交互控件、由 stw:quiz-close 自动收起，不满足「需要
+     焦点陷阱」的前提——降级为普通 role="dialog"、移除 aria-modal，不再宣称一个不存在的背景惰性契约。
+     js/a11y.js 只扫 [aria-modal="true"]，本层天然不参与陷阱、不抢焦点；显隐仍走 stw:quiz-close -->
+<div class="auth" id="revealModal" hidden role="dialog" aria-label="释义">
+  <div class="auth-card">
+    <b class="quiz-word" id="revealWord"></b>
+    <p class="reveal-meaning" id="revealMeaning"></p>
+  </div>
+</div>
+
+<!-- review summary card (docs/learn-mode.md §4 W3): h3「复习完成」+ 副标题「共 N 词 · 答对 x」（非零段
+     追加 答错/重学/跳过，2026-09-29 口径）；[再来一轮]/[退出] 由 app.js
+     先收卡再派 stw:review-extra / stw:review-exit（状态机在 js/review.js）；文案位复用 .checkin-stats，不新增类。
+     B5（2026-09-30 工单 P2）：组概念退役，复习侧按钮「再来一组」→「再来一轮」（复习语义是换盐重抽一轮，
+     内部命名 extraReview / track 事件 review-extra 保留不动，保分析连续性）。
+     R1（2026-10-01 用户反馈）：remaining=期初到期数-答对数，为 0 时不再给重练钮，改显
+     「没有可以复习的了」；有余词时按钮文案「把错题重答一下 · 还剩 N 词」（P6 2026-10-01
+     用户定调：错题重答语义替换「再来一轮」）。
+     P7（2026-10-01 用户反馈：连错别死循环）：重练轮次上限 2（review.js MAX_GROUPS）——
+     第 2 轮总结不再给钮，显「今天先到这里，明天再来一遍」（答错的词 next_due 已归当日，
+     明日自然再来）。
+     P10（2026-10-01 用户反馈）：答后自动重播本词片段（settleQuiz→__stwLearnGo 重开），播完
+     已答词 clip-ended→advance 自动前进；键行状态互换——答题换普通灰底（P11：不保留渐变，
+     避免同屏双主色）、下一词升渐变主钮。
+     P17→P18/P19（2026-10-01 用户定调）：错题回炉退役（quiz 弹层款拆除），错题并入胶囊管线——
+     学习门答错的词经 enqueueWrong 进 FIFO 队列（ready:false），**不随答错当次弹出**：下一次
+     点「下一词」直接跳，错题胶囊隔一次点击才就绪弹出（P19：避免刚错就补考）；「错题胶囊/
+     闪回胶囊」#flashTag 标签区分（stw:flash-show detail.type）；错题词不再被闪回重复抽取
+     （pickCandidate 跳过队列成员）；每 2 词的闪回胶囊当次就绪，同队列 FIFO-->
+<div class="auth" id="reviewSummaryModal" hidden role="dialog" aria-modal="true" aria-label="复习完成">
+  <div class="auth-card">
+    <h3>复习完成</h3>
+    <p class="checkin-stats" id="reviewSummaryStats"></p>
+    <p class="checkin-stats" id="reviewSummaryNone" hidden>没有可以复习的了</p>
+    <button type="button" class="auth-btn" id="reviewExtraBtn">把错题重答一下</button>
+    <button type="button" class="auth-alt" id="reviewExitBtn">退出</button>
   </div>
 </div>
 
@@ -412,748 +416,10 @@ body.is-playing .deck-cd{animation-play-state:running}
   </div>
 </div>
 
-<div class="start" id="start"><div class="start-inner"><div class="start-brand"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><b>Sing<span>lish</span></b></div><p class="start-tag">听歌记单词</p><button type="button" id="startBtn">轻触开唱<small>左右滑动，换个词<br>上下滑动，换个歌</small></button></div></div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-<script>
-(() => {
-let ALL = [], DATA = [];   // ALL: the whole word bank; DATA: the words of the chosen dictionary
-// data.json shortens long, repeated URL prefixes
-const PREFIX = { '~a/': 'https://audio-ssl.itunes.apple.com/itunes-assets/', '~i/': 'https://is1-ssl.mzstatic.com/image/thumb/', '~m/': 'https://music.apple.com/us/' };
-const expand = u => u && u[0] === '~' ? PREFIX[u.slice(0, 3)] + u.slice(3) : u;
-// a word can have several clips (songs); the active one's fields live on the entry itself
-/* Umami custom events; a no-op if the script is blocked or not loaded yet */
-function track(name, data) {
-  // the script loads deferred: queue anything sent before it's ready, give up after ~10s (blocked)
-  if (window.umami) { try { umami.track(name, data); } catch {} return; }
-  let n = 0; const t = setInterval(() => { if (window.umami || ++n > 20) { clearInterval(t); try { window.umami?.track(name, data); } catch {} } }, 500);
-}
-function useClip(e, k) { e.ci = k; Object.assign(e, e.clips[k]); }
-const DICT_NAME = { ielts: '雅思', cet4: '四级', cet6: '六级', toefl: '托福' };
-const $ = (s, r = document) => r.querySelector(s);
-const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const store = {
-  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
-  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
-};
-const mq = matchMedia('(max-width: 899px)');
-const isMobile = () => mq.matches;
-const pad = n => String(n).padStart(3, '0');
-const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+<script type="module" src="./js/main.js?v=p51"></script>
 
-const state = { dict: store.get('stw.dict', 'all'), cur: 0, loop: false, shuffle: store.get('stw.shuffle', false), done: new Set(store.get('stw.done', [])), fav: new Set(store.get('stw.fav', [])), started: false };
-const inDict = (e, d) => d === 'all' || (d === 'fav' ? state.fav.has(e.word) : e.tags.includes(d));
-// a return visit: first time we see this browser on a new calendar day, with days since the first visit
-(() => {
-  // local calendar day as YYYY-MM-DD
-  const today = new Date().toLocaleDateString('sv'), first = store.get('stw.first', null), last = store.get('stw.last', null);
-  if (!first) store.set('stw.first', today);
-  else if (last !== today) track('return', { days: Math.round((Date.parse(today) - Date.parse(first)) / 864e5) });
-  store.set('stw.last', today);
-})();
 
-/* ---------- lyrics (fetched at runtime; only the lines around the word are kept) ---------- */
-const lyr = new Map();
-function parseLrc(s) {
-  return s.split('\n').map(l => { const m = l.match(/^\[(\d+):(\d+(?:\.\d+)?)\](.*)$/); return m && { t: +m[1] * 60 + +m[2], x: m[3].trim() }; }).filter(Boolean);
-}
-function loadLyrics(i) {
-  if (lyr.has(i)) return lyr.get(i);
-  const e = DATA[i];
-  const p = fetch(`https://lrclib.net/api/get/${e.lrclib}`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(d => {
-    const all = parseLrc(d.syncedLyrics || '');
-    // The Apple preview covers [off, off+30) of the full track; only show lines that fall inside it.
-    const off = e.offset, lim = off + 29.6;
-    let k = all.findIndex(l => Math.abs(l.t - e.t) < .05);
-    if (k < 0) k = all.findIndex(l => l.t >= e.t - .5);
-    const inside = j => all[j] && all[j].x && all[j].t >= off + .2 && (all[j + 1]?.t ?? all[j].t + 4) <= lim + 1.5;
-    let from = k; if (inside(k - 1) && e.t - all[k - 1].t < 9) from = k - 1;
-    let to = k; while (to < k + 2 && inside(to + 1)) to++;
-    const lines = [];
-    for (let j = from; j <= to; j++) if (all[j].x) {
-      // measured timing from the preview audio (whisper large-v3), when the build found it for this line
-      const wt = e.wt?.[all[j].t.toFixed(2)];
-      lines.push({ t: all[j].t, st: wt ? wt.s : all[j].t, wt: wt?.w, end: Math.min(all[j + 1]?.t ?? all[j].t + 4, lim), x: all[j].x, target: j === k });
-    }
-    const start = Math.max(off + .05, Math.min(lines[0].t, lines[0].st) - 1.2);
-    let end = Math.min(lim, lines.at(-1).end + .4);
-    if (end - start > 20) end = start + 20;
-    return { lines, start, end };
-  });
-  lyr.set(i, p);
-  p.catch(() => lyr.delete(i));
-  return p;
-}
-const re = f => new RegExp(`\\b(${f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})\\b`, 'i');
-function lineHTML(L, form, ex) {
-  const words = L.x.split(/\s+/);
-  const r = L.target ? re(form) : null;
-  const mine = new Map((ex || []).map((x, n) => [x, n]).filter(([x]) => x.k === L.t.toFixed(2)).map(([x, n]) => [x.i, n]));
-  return words.map((w, i) => {
-    if (r && r.test(w)) return `<span class="lw tw" data-x="main" tabindex="0">${esc(w)}</span>`;
-    if (mine.has(i)) return `<span class="lw xw" data-x="${mine.get(i)}" tabindex="0">${esc(w)}</span>`;
-    return `<span class="lw">${esc(w)}</span>`;
-  }).join(' ');
-}
-async function fillLyrics(i, root) {
-  const box = root.querySelector('.lyrics-in');
-  if (!box || box.dataset.ok) return;
-  try {
-    const L = await loadLyrics(i);
-    box.innerHTML = L.lines.map(l => `<p class="ln">${lineHTML(l, DATA[i].form, DATA[i].ex)}</p>`).join('');
-    box.dataset.ok = 1;
-  } catch {
-    box.innerHTML = `<p class="lyr-msg">歌词加载失败，请检查网络后点播放重试。</p>`;
-  }
-}
 
-/* ---------- rendering ---------- */
-const noteIco = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 18.5A2.5 2.5 0 1 1 6.5 16c.53 0 1.02.16 1.5.44V5l11-2v12.5A2.5 2.5 0 1 1 16.5 13c.53 0 1.02.16 1.5.44V7.4l-7 1.27v9.83z"/></svg>';
-const spk = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
-const shareIco = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/></svg>';
-const thumb = e => e.art.replace('600x600bb', '200x200bb');
-function stageHTML(i) {
-  const e = DATA[i];
-  const dots = e.clips.length > 1 ? `<div class="clip-dots" role="group" aria-label="这个词的歌曲（上下滑动或 ↑↓ 切换）">${e.clips.map((c, k) => `<button type="button" class="clip-dot${k === e.ci ? ' on' : ''}" data-clipto="${i}:${k}" aria-label="第 ${k + 1} 首：${esc(c.title)}" title="${esc(c.title)} · ${esc(c.artist)}"></button>`).join('')}</div>` : '';
-  return `<article class="stage" data-i="${i}">${dots}
-    <div class="st-top"><span class="pill band">${e.tags.includes('ielts') ? `雅思 ${esc(e.band)}` : esc(e.tags.map(t => DICT_NAME[t]).join('·'))}</span><span class="pill">${esc(e.pos)}</span><span class="no">#${pad(i + 1)}</span><button type="button" class="st-share st-fav" data-fav="${i}" aria-pressed="${state.fav.has(e.word)}" aria-label="收藏这个词" title="收藏到生词本">${state.fav.has(e.word) ? '★' : '☆'}</button><button type="button" class="st-share" data-share="${i}" aria-label="分享这个词" title="生成分享图">${shareIco}</button></div>
-    <h2 class="st-word">${esc(e.word)}</h2>
-    <div class="st-row"><button class="st-ipa" type="button" data-say="${esc(e.word)}" aria-label="朗读 ${esc(e.word)}">${spk}<span>${esc(e.phonetic)}</span></button><p class="st-mean">${esc(e.meaning)}</p></div>
-    ${e.en ? `<p class="st-en">${esc(e.en)}</p>` : ''}
-    ${e.tip ? `<div class="st-tip"><b>搭配</b>${esc(e.tip)}</div>` : ''}
-    ${e.formNote ? `<p class="st-note">${esc(e.formNote)}</p>` : ''}
-    <div class="lyrics"><div class="lyrics-in"><p class="lyr-msg">正在加载歌词…</p></div></div>
-  </article>`;
-}
-const grid = $('#grid'), carousel = $('#carousel'), deskStage = $('#deskStage');
-function renderGrid() {
-  const q = $('#q').value.trim().toLowerCase();
-  let n = 0;
-  grid.innerHTML = DATA.map((e, i) => {
-    if (q && ![e.word, e.meaning, e.title.toLowerCase(), e.artist.toLowerCase()].some(s => s.includes(q))) return '';
-    n++;
-    return `<button type="button" class="card" data-i="${i}">
-      <span class="disc"><img src="${thumb(e)}" alt="" loading="lazy"></span>
-      <span class="no">#${pad(i + 1)}</span><span class="w${e.word.length >= 10 ? ' long' : ''}">${esc(e.word)}</span><span class="ph">${esc(e.phonetic)}</span>
-      <span class="mn">${esc(e.pos)} ${esc(e.meaning)}</span><span class="sg"><b>${esc(e.title)}</b> · ${esc(e.artist)}</span></button>`;
-  }).join('') || (ALL.length ? '<p class="empty">没有匹配的单词</p>' : '<p class="loading">正在加载词库…</p>');
-  $('#countLine').textContent = q ? `${n} 个匹配` : `${DATA.length} 个单词 · ${new Set(DATA.flatMap(e => e.clips.map(c => c.artist))).size} 位歌手`;
-  markCards(true);
-}
-let marked = -1;
-function markCards(full) {
-  // thousands of cards: only touch the previous and current card unless a full refresh is asked for
-  const cards = full ? grid.querySelectorAll('.card') : [grid.querySelector(`.card[data-i="${marked}"]`), grid.querySelector(`.card[data-i="${state.cur}"]`)].filter(Boolean);
-  cards.forEach(c => {
-    const i = +c.dataset.i;
-    c.classList.toggle('on', i === state.cur);
-    c.classList.toggle('done', state.done.has(DATA[i].word));
-    c.classList.toggle('fav', state.fav.has(DATA[i].word));
-    c.classList.toggle('playing', i === state.cur && P.playing);
-  });
-  marked = state.cur;
-  $('#doneCount').textContent = DATA.filter(e => state.done.has(e.word)).length;
-  $('#progFill').style.width = `${DATA.length ? DATA.filter(e => state.done.has(e.word)).length / DATA.length * 100 : 0}%`;
-}
-
-/* ---------- audio (Apple Music 30 s previews) ---------- */
-const au = new Audio(); au.preload = 'auto';
-au.addEventListener('playing', () => { P.playing = true; updateBtn(); });
-au.addEventListener('pause', () => { P.playing = false; updateBtn(); });
-au.addEventListener('error', () => { if (au.src) showErr(); });
-let unlocked = false, priming = false;
-// iOS only lets audio start inside a tap; start (muted) right in the gesture so later swipes can play freely.
-function prime(i) {
-  if (unlocked || !au.paused) return; unlocked = true;
-  store.set('stw.seen', 1);   // came through the start gate once: skip it on later visits
-  if (au.src !== DATA[i].preview) au.src = DATA[i].preview;
-  au.muted = true; priming = true;
-  // the unlock play() can resolve late; only pause it if real playback hasn't started meanwhile
-  au.play().then(() => { if (priming) au.pause(); priming = false; au.muted = false; }).catch(err => { priming = false; au.muted = false; if (err?.name === 'NotAllowedError') unlocked = false; });   // an interrupted unlock still counts
-}
-function seekPlay(src, t) {
-  priming = false;
-  const start = () => { try { au.currentTime = t; } catch {} au.muted = false; au.play().catch(() => { P.playing = false; updateBtn(); }); };
-  if (au.src !== src) { au.src = src; au.addEventListener('loadedmetadata', start, { once: true }); au.load(); }
-  else if (au.readyState >= 1) start();
-  else au.addEventListener('loadedmetadata', start, { once: true });
-}
-function setDeck(i) {
-  const e = DATA[i];
-  $('#deckArt').src = e.art;
-  $('#deckBg').style.backgroundImage = `url("${e.art}")`;
-  $('#deckTitle').textContent = e.title; $('#deckArtist').textContent = e.artist;
-  $('#deckLink').href = e.appleUrl;
-  $('#deckProg').style.width = '0';
-}
-function cue(i) { setDeck(i); }
-function showErr() {
-  const e = DATA[state.cur];
-  const box = P.root?.querySelector('.lyrics-in');
-  if (box && !box.querySelector('.play-err')) box.insertAdjacentHTML('beforeend', `<p class="lyr-msg play-err">试听加载失败，<a href="${esc(e.appleUrl)}" target="_blank" rel="noopener">去 Apple Music 听这首</a>。</p>`);
-}
-
-/* ---------- player / karaoke ---------- */
-const P = { i: -1, root: null, L: null, raf: 0, playing: false, curLine: -1, timer: 0, token: 0 };
-function currentRoot() { if (isMobile()) fillSlides(state.cur); return isMobile() ? carousel.children[state.cur]?.querySelector('.stage') : deskStage.querySelector('.stage'); }
-function resetVisual(root) {
-  if (!root) return;
-  root.classList.remove('live');
-  root.querySelectorAll('.ln').forEach(l => l.classList.remove('cur', 'past'));
-  root.querySelectorAll('.lw').forEach(w => { w.style.removeProperty('--p'); w._p = undefined; });
-  const inner = root.querySelector('.lyrics-in'); if (inner) inner.style.transform = '';
-}
-function stop() {
-  P.token++;
-  if (typeof hideGloss === 'function') hideGloss();
-  clearTimeout(P.timer); cancelAnimationFrame(P.raf);
-  if (!au.paused) au.pause();
-  P.playing = false; P.curLine = -1;
-  resetVisual(P.root);
-  updateBtn();
-}
-async function play(i, from) {
-  stop();
-  const token = P.token;
-  P.i = i; P.root = currentRoot();
-  await fillLyrics(i, P.root);
-  let L; try { L = await loadLyrics(i); } catch { return; }
-  if (token !== P.token) return;
-  P.L = L;
-  P.lineEls = [...P.root.querySelectorAll('.ln')];
-  P.wordEls = P.lineEls.map(l => [...l.querySelectorAll('.lw')]);
-  P.box = P.root.querySelector('.lyrics'); P.inner = P.root.querySelector('.lyrics-in');
-  P.root.classList.add('live');
-  $('#clipTag').textContent = `片段 ${fmt(L.start)}–${fmt(L.end)}`;
-  seekPlay(DATA[i].preview, Math.max(L.start, from ?? L.start) - DATA[i].offset);
-  const w = DATA[i].word; if (!state.done.has(w)) { state.done.add(w); store.set('stw.done', [...state.done]); markCards(); }
-  P.raf = requestAnimationFrame(frame);
-  preload(i + 1); preload(i + 2);
-}
-function preload(i) { if (i < DATA.length) loadLyrics(i).catch(() => {}); }
-function frame() {
-  const t = au.currentTime + DATA[P.i].offset; // position on the full-track (LRC) timeline
-  if (!au.paused && t >= P.L.start - .5) {
-    render(t);
-    $('#deckProg').style.width = `${Math.min(100, Math.max(0, (t - P.L.start) / (P.L.end - P.L.start) * 100))}%`;
-  }
-  if ((!au.paused && t >= P.L.end) || au.ended) return ended();
-  P.raf = requestAnimationFrame(frame);
-}
-function render(t) {
-  const L = P.L.lines;
-  let cur = -1; for (let k = 0; k < L.length; k++) if (t >= L[k].st - .08) cur = k;
-  if (cur !== P.curLine) {
-    P.lineEls.forEach((el, k) => { el.classList.toggle('cur', k === cur); el.classList.toggle('past', k < cur); });
-    if (P.curLine >= 0) P.wordEls[P.curLine]?.forEach(w => w.style.removeProperty('--p'));
-    P.curLine = cur;
-    const el = P.lineEls[Math.max(0, cur)];
-    if (el && P.inner) {
-      const top = Math.max(0, el.offsetTop - (P.box.clientHeight - el.offsetHeight) / 2);
-      P.inner.style.transform = `translateY(${-top}px)`;
-    }
-  }
-  if (cur >= 0) {
-    const line = L[cur], words = P.wordEls[cur] || [];
-    const setP = (w, p) => { if (w._p !== p) { if (p > 0 && !(w._p > 0) && (w.classList.contains('xw') || w.classList.contains('tw'))) showGloss(w, 2400); w._p = p; w.style.setProperty('--p', p.toFixed(3)); if (w.classList.contains('tw') || w.classList.contains('xw')) w.classList.toggle('hit', p > 0); } };
-    if (line.wt && line.wt.length === words.length) {
-      // measured: each word fills from its own sung start to the next word's start
-      words.forEach((w, i) => {
-        const s = line.wt[i], e = Math.min(line.wt[i + 1] ?? line.end, s + 1.2);
-        setP(w, t <= s ? 0 : t >= e ? 1 : (t - s) / Math.max(.08, e - s));
-      });
-    } else {
-      // LRC gives line timing only; spread the fill across the words, weighted by length.
-      const span = Math.min(line.end - line.st, .34 * line.x.length / 3 + .6) * .92;
-      const total = words.reduce((a, w) => a + w.textContent.length + 1, 0);
-      let acc = 0;
-      words.forEach(w => {
-        const s = line.st + span * acc / total; acc += w.textContent.length + 1;
-        const e = line.st + span * acc / total;
-        setP(w, t <= s ? 0 : t >= e ? 1 : (t - s) / (e - s));
-      });
-    }
-  }
-  $('#time').textContent = `${fmt(Math.max(0, t - P.L.start))} / ${fmt(P.L.end - P.L.start)}`;
-}
-function ended() {
-  maybeSurvey(P.i);
-  au.pause(); P.playing = false; updateBtn();
-  P.lineEls.forEach(l => { l.classList.remove('cur'); l.classList.add('past'); });
-  const token = P.token;
-  P.timer = setTimeout(() => {
-    if (token !== P.token) return;
-    // Like any music player: keep going to the next clip unless the current one is on repeat.
-    if (state.loop) play(P.i);
-    else goNext();
-  }, 900);
-}
-function updateBtn() {
-  const on = P.playing;
-  $('#icoPlay').toggleAttribute('hidden', on); $('#icoPause').toggleAttribute('hidden', !on);
-  $('#play').setAttribute('aria-label', on ? '暂停' : '播放');
-  document.body.classList.toggle('is-playing', on);
-  markCards();
-}
-function toggle() {
-  if (P.i !== state.cur || !P.L) return play(state.cur);
-  if (P.playing) { au.pause(); cancelAnimationFrame(P.raf); P.playing = false; }
-  else if (P.root.classList.contains('live') && au.currentTime + DATA[P.i].offset < P.L.end - .2) { au.play().catch(() => {}); P.raf = requestAnimationFrame(frame); }
-  else return play(state.cur);
-  updateBtn();
-}
-
-/* ---------- navigation ---------- */
-let suppressScroll = false, scrollT = 0;
-let artFlip = false;
-function setArt(i) {
-  const [on, off] = artFlip ? [$('#artA'), $('#artB')] : [$('#artB'), $('#artA')];
-  artFlip = !artFlip;
-  on.style.backgroundImage = `url("${DATA[i].art}")`;
-  on.classList.add('show'); off.classList.remove('show');
-}
-// Shuffle: "next" picks a random word (unsung ones first); "previous" walks back through what was played.
-const hist = [];
-function nextIndex() {
-  if (!state.shuffle) return state.cur + 1;
-  const all = DATA.map((_, i) => i).filter(i => i !== state.cur);
-  const fresh = all.filter(i => !state.done.has(DATA[i].word));
-  const pool = fresh.length ? fresh : all;
-  return pool[Math.floor(Math.random() * pool.length)];
-}
-function goNext() { go(nextIndex(), true); }
-function goPrev() {
-  if (state.shuffle && hist.length) { const i = hist.pop(); go(i, true, true); }
-  else go(state.cur - 1, true);
-}
-function go(i, autoplay, back) {
-  i = (i + DATA.length) % DATA.length;
-  try { history.replaceState(null, '', '#' + encodeURIComponent(DATA[i].word)); } catch {}
-  store.set('stw.pos', { word: DATA[i].word, ci: DATA[i].ci });   // reopen here next time
-  if (i !== state.cur && !back) { hist.push(state.cur); if (hist.length > 200) hist.shift(); }
-  if (i !== state.cur || !artFlip) setArt(i);
-  stop();
-  state.cur = i; P.i = -1; P.L = null;
-  if (isMobile()) {
-    fillSlides(i);
-    const slide = carousel.children[i];
-    if (slide && Math.abs(carousel.scrollLeft - slide.offsetLeft) > 2) { suppressScroll = true; carousel.scrollTo({ left: slide.offsetLeft, behavior: 'auto' }); setTimeout(() => suppressScroll = false, 80); }
-  } else deskStage.innerHTML = stageHTML(i);
-  P.root = currentRoot();
-  fillLyrics(i, P.root);
-  if (isMobile()) { [i - 1, i + 1].forEach(j => { const s = carousel.children[j]?.querySelector('.stage'); if (s) fillLyrics(j, s); }); }
-  markCards();
-  loadLyrics(i).then(L => { if (state.cur === i) $('#time').textContent = `0:00 / ${fmt(L.end - L.start)}`; }).catch(() => {});
-  cue(i);
-  if (autoplay) play(i);
-}
-function buildCarousel() {
-  if (carousel.childElementCount === DATA.length) return;
-  carousel.innerHTML = DATA.map((_, i) => `<div class="slide" data-i="${i}"></div>`).join('');
-}
-// only a few slides hold a real stage at any time; the rest are empty snap targets
-const filled = new Set();
-function fillSlides(i) {
-  for (let j = i - 2; j <= i + 2; j++) { const sl = carousel.children[j]; if (sl && !sl.firstChild) { sl.innerHTML = stageHTML(j); filled.add(j); } }
-  for (const j of [...filled]) if (Math.abs(j - i) > 4) { const sl = carousel.children[j]; if (sl) sl.innerHTML = ''; filled.delete(j); }
-}
-carousel.addEventListener('scroll', () => {
-  if (suppressScroll) return;
-  clearTimeout(scrollT);
-  scrollT = setTimeout(settle, 'onscrollend' in window ? 400 : 140);
-}, { passive: true });
-carousel.addEventListener('scrollend', () => { if (!suppressScroll) { clearTimeout(scrollT); settle(); } });
-function settle() {
-  const i = Math.round(carousel.scrollLeft / carousel.clientWidth);
-  if (i === state.cur || i < 0 || i >= DATA.length) return;
-  go(i, state.started);
-}
-
-/* ---------- tap a lyric line to sing from there ---------- */
-function playLine(i, k) {
-  const startOf = L => Math.max(L.start, Math.min(L.lines[k].t, L.lines[k].st) - 0.3);
-  if (P.i === i && P.L && P.playing) {
-    // already singing this clip: jump within it
-    clearTimeout(P.timer);
-    au.currentTime = startOf(P.L) - DATA[i].offset;
-    return;
-  }
-  loadLyrics(i).then(L => play(i, startOf(L))).catch(() => {});
-}
-document.addEventListener('click', e => {
-  const ln = e.target.closest('.stage .ln'); if (!ln) return;
-  const stage = ln.closest('.stage'), i = +stage.dataset.i, k = [...stage.querySelectorAll('.ln')].indexOf(ln);
-  if (k < 0) return;
-  state.started = true; $('#start').hidden = true; prime(i);
-  if (i !== state.cur) go(i, false);
-  playLine(i, k);
-});
-
-/* ---------- gloss: a tiny label in the gap above the word's line (no reflow) ---------- */
-let glossTimer = 0;
-function showGloss(el, ms) {
-  const stage = el.closest('.stage'), inner = stage?.querySelector('.lyrics-in'), line = el.closest('.ln'); if (!inner || !line) return;
-  const e = DATA[+stage.dataset.i];
-  const x = el.dataset.x === 'main' ? { w: e.word, p: e.phonetic, m: e.meaning } : e.ex?.[+el.dataset.x]; if (!x) return;
-  let g = inner.querySelector('.gloss');
-  if (!g) { g = document.createElement('span'); g.className = 'gloss'; g.setAttribute('role', 'tooltip'); inner.appendChild(g); }
-  g.innerHTML = `<b>${esc(x.w)}</b><i>${esc(x.p)}</i><span>${esc(x.m)}</span>`;
-  g.classList.toggle('main', el.dataset.x === 'main');   // label takes the colour of its highlighter
-  // vertically: centred on the boundary between this line and the one above (the padding gap);
-  // horizontally: centred on the word, kept inside the lyrics box. Coordinates are the scroller's own.
-  const ir = inner.getBoundingClientRect(), r = el.getBoundingClientRect(), half = g.offsetWidth / 2 + 2;
-  // wrapped lines have no room between their own rows: a word on the first row gets the gap above the line,
-  // a word on a later row gets the gap below it
-  const lr = line.getBoundingClientRect(), firstRow = r.top - lr.top < r.height * .8;
-  g.style.top = firstRow ? `${line.offsetTop - g.offsetHeight / 2 + 1}px` : `${line.offsetTop + line.offsetHeight - g.offsetHeight / 2 - 1}px`;
-  g.style.left = `${Math.min(ir.width - half, Math.max(half, r.left - ir.left + r.width / 2))}px`;
-  g.classList.add('on');
-  clearTimeout(glossTimer);
-  if (ms) glossTimer = setTimeout(() => g.classList.remove('on'), ms);
-}
-function hideGloss() { clearTimeout(glossTimer); document.querySelectorAll('.gloss.on').forEach(g => g.classList.remove('on')); }
-document.addEventListener('mouseover', e => { const w = e.target.closest?.('.xw,.tw[data-x]'); if (w) showGloss(w, 0); });
-document.addEventListener('mouseout', e => { if (e.target.closest?.('.xw,.tw[data-x]')) hideGloss(); });
-document.addEventListener('click', e => { const w = e.target.closest('.xw,.tw[data-x]'); if (w) showGloss(w, 2600); });
-document.addEventListener('focusin', e => { const w = e.target.closest?.('.xw,.tw[data-x]'); if (w) showGloss(w, 0); });
-document.addEventListener('focusout', e => { if (e.target.closest?.('.xw,.tw[data-x]')) hideGloss(); });
-
-/* ---------- full version: want counter (Abacus, no account) + one-time survey ---------- */
-const COUNTER = 'https://abacus.jasoncameron.dev', NS = 'bigjeager-singlish';
-const counter = (op, key) => fetch(`${COUNTER}/${op}/${NS}/${key}`).then(r => r.ok ? r.json() : { value: 0 }).then(d => d.value || 0);
-let wantCount = null;
-function renderWant() {
-  const voted = store.get('stw.vote', null);
-  document.querySelectorAll('[data-want]').forEach(b => { const on = voted === 'want'; b.setAttribute('aria-pressed', on); b.textContent = on ? '♥ 已想要' : '♥ 想要'; });
-  document.querySelectorAll('[data-want-count]').forEach(el => el.textContent = wantCount ? `已有 ${wantCount} 人想要` : '');
-}
-counter('get', 'want').then(v => { wantCount = v; renderWant(); }).catch(() => {});   // if the service is down, just no number
-function vote(kind) {
-  const prev = store.get('stw.vote', null);
-  if (prev === 'want' || prev === kind) return;
-  track(kind);   // 'want' or 'meh', each its own event
-  store.set('stw.vote', kind); store.set('stw.survey', 1);
-  if (kind === 'want' && wantCount != null) wantCount++;
-  renderWant();
-  counter('hit', kind).then(v => { if (kind === 'want') { wantCount = v; renderWant(); } }).catch(() => {});
-}
-document.addEventListener('click', e => { if (e.target.closest('[data-want]')) { vote('want'); if (!$('#survey').hidden) setTimeout(closeSurvey, 700); } });
-$('#surveyMeh').addEventListener('click', () => { vote('meh'); closeSurvey(); });
-$('#surveyClose').addEventListener('click', () => { store.set('stw.survey', 1); closeSurvey(); });
-$('#survey').addEventListener('click', e => { if (e.target.id === 'survey') { store.set('stw.survey', 1); closeSurvey(); } });
-function closeSurvey() { $('#survey').hidden = true; }
-$('#openFull').addEventListener('click', () => { renderWant(); $('#survey').hidden = false; });   // open any time from the header
-// ask once, after the listener has finished five different clips in this visit
-const sungThisVisit = new Set();
-function maybeSurvey(i) {
-  if (i < 0) return;
-  const before = sungThisVisit.size;
-  sungThisVisit.add(DATA[i].word);
-  if (sungThisVisit.size !== before && [5, 20, 50].includes(sungThisVisit.size)) track('sung', { n: sungThisVisit.size });
-  if (sungThisVisit.size >= 5 && !store.get('stw.survey', 0) && !store.get('stw.vote', null) && $('#sheet').hidden) { store.set('stw.survey', 1); $('#survey').hidden = false; track('full-pill', { from: 'auto' }); }
-}
-renderWant();
-
-/* ---------- share image ---------- */
-const pageUrl = (i, src, content) => location.origin + location.pathname + (src ? `?utm_source=${src}` : '') + (content ? `&utm_content=${content}` : '') + '#' + encodeURIComponent(DATA[i].word);
-// share text takes turns through these; utm_content carries which one, so visits can be credited to a line
-const SHARE_LINES = ['每个单词，都有一首歌', '听歌，顺便把单词背了', '唱过的词，忘不掉', '单曲循环过的歌词，想忘都难', '这首歌里，藏着一个考试词', '背单词这件事，终于不无聊了'];
-const loadImg = src => new Promise((ok, no) => { const im = new Image(); im.crossOrigin = 'anonymous'; im.onload = () => ok(im); im.onerror = no; im.src = src; });
-function rrect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
-function fitFont(g, text, weight, family, max, width) { let size = max; do { g.font = `${weight} ${size}px ${family}`; size -= 4; } while (g.measureText(text).width > width && size > 24); return g.font; }
-// wrap for mixed CJK / Latin text: Latin breaks at spaces, CJK at any character
-function wrap(g, text, width) {
-  const parts = text.match(/[\u3000-\u9fff\uff00-\uffef]|[^\s\u3000-\u9fff\uff00-\uffef]+|\s+/g) || [];
-  const lines = []; let cur = '';
-  for (const p of parts) { const t = cur + p; if (g.measureText(t.trim()).width > width && cur.trim()) { lines.push(cur.trim()); cur = p.trimStart(); } else cur = t; }
-  if (cur.trim()) lines.push(cur.trim()); return lines;
-}
-async function makeCard(i) {
-  // Minimal poster: cover as a CD, the word, one line of meaning, the sung line, a QR code.
-  const e = DATA[i], W = 1080, H = 1440;
-  const DISPLAY = '"Bricolage Grotesque","PingFang SC",sans-serif', BODY = '"Figtree","PingFang SC","Hiragino Sans GB",sans-serif', IPA = '"Gentium Book Plus","Charis SIL",serif';
-  await Promise.all([document.fonts.load(`800 120px ${DISPLAY}`), document.fonts.load(`700 40px ${BODY}`), document.fonts.load(`400 40px ${IPA}`)]).catch(() => {});
-  const [art, L] = await Promise.all([loadImg(e.art).catch(() => null), loadLyrics(i).catch(() => null)]);
-  const c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
-  const grad = (x0, x1) => { const k = g.createLinearGradient(x0, 0, x1, 0); k.addColorStop(0, '#FF4D8D'); k.addColorStop(.55, '#FF7A59'); k.addColorStop(1, '#FFB547'); return k; };
-  const cx = W / 2;
-  // background: the cover, blurred, under a dark wash
-  g.fillStyle = '#0B0A14'; g.fillRect(0, 0, W, H);
-  if (art) { g.save(); g.filter = 'blur(80px) saturate(1.5)'; g.globalAlpha = .55; g.drawImage(art, -260, -260, W + 520, W + 520); g.restore(); }
-  const wash = g.createLinearGradient(0, 0, 0, H); wash.addColorStop(0, 'rgba(11,10,20,.3)'); wash.addColorStop(.6, 'rgba(11,10,20,.82)'); wash.addColorStop(1, 'rgba(11,10,20,.97)');
-  g.fillStyle = wash; g.fillRect(0, 0, W, H);
-  // measure the sung line first (max 2 rows), so the CD can take whatever room is left
-  const line = L?.lines.find(l => l.target);
-  let rows = [], fs = 40, space = 0;
-  if (line) {
-    const rx = new RegExp(`\\b${e.form.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
-    for (fs = 40; fs >= 30; fs -= 4) {
-      g.font = `700 ${fs}px ${DISPLAY}`; space = g.measureText(' ').width; rows = [[]]; let rw = 0;
-      for (const t of line.x.split(/\s+/)) { const w = g.measureText(t).width; if (rw + w > 860 && rows.at(-1).length) { rows.push([]); rw = 0; } rows.at(-1).push({ t, w, hit: rx.test(t) }); rw += w + space; }
-      if (rows.length <= 2) break;
-    }
-  }
-  const lyricH = line ? rows.length * (fs + 20) + 56 : 0;
-  const bottomLimit = H - 250, below = 175 + 70 + (line ? 60 + lyricH : 0);
-  const r = Math.max(170, Math.min(270, (bottomLimit - below - 120) / 2));
-  const cy = 110 + r;
-  // the CD
-  g.save(); g.shadowColor = 'rgba(0,0,0,.55)'; g.shadowBlur = 60; g.shadowOffsetY = 24; g.beginPath(); g.arc(cx, cy, r + 14, 0, Math.PI * 2); g.fillStyle = '#08070D'; g.fill(); g.restore();
-  g.save(); g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.clip();
-  if (art) g.drawImage(art, cx - r, cy - r, r * 2, r * 2); else { g.fillStyle = '#222'; g.fill(); }
-  g.strokeStyle = 'rgba(0,0,0,.12)'; g.lineWidth = 1.5; for (let rr = 50; rr < r; rr += 8) { g.beginPath(); g.arc(cx, cy, rr, 0, Math.PI * 2); g.stroke(); }
-  g.restore();
-  g.beginPath(); g.arc(cx, cy, r * .14, 0, Math.PI * 2); g.fillStyle = 'rgba(0,0,0,.4)'; g.fill();
-  g.beginPath(); g.arc(cx, cy, r * .06, 0, Math.PI * 2); g.fillStyle = '#0B0A14'; g.fill();
-  // the word + one line: pronunciation · meaning
-  let y = cy + r + 175;
-  g.textAlign = 'center'; g.fillStyle = '#F7F5FF'; g.font = fitFont(g, e.word, 800, DISPLAY, 170, 920); g.fillText(e.word, cx, y);
-  y += 70;
-  g.font = `400 40px ${IPA}`; const iw = g.measureText(e.phonetic).width;
-  g.font = `600 38px ${BODY}`; const mw = g.measureText(e.meaning).width;
-  const x0 = cx - (iw + 30 + mw) / 2; g.textAlign = 'left';
-  g.font = `400 40px ${IPA}`; g.fillStyle = '#A9A5C8'; g.fillText(e.phonetic, x0, y);
-  g.font = `600 38px ${BODY}`; g.fillStyle = '#E4E1F5'; g.fillText(e.meaning, x0 + iw + 30, y);
-  // the sung line, target word under a highlighter, then the song in small type
-  if (line) {
-    y += 60 + fs;
-    g.font = `700 ${fs}px ${DISPLAY}`;
-    rows.forEach((row, k) => {
-      const total = row.reduce((a, o) => a + o.w, 0) + space * (row.length - 1); let x = cx - total / 2; const by = y + k * (fs + 20);
-      for (const o of row) {
-        if (o.hit) { g.save(); g.translate(x + o.w / 2, by - fs * .34); g.rotate(-.02); g.fillStyle = '#FFE14A'; rrect(g, -o.w / 2 - 5, -fs * .72, o.w + 10, fs * 1.18, 10); g.fill(); g.restore(); g.fillStyle = '#1D1426'; }
-        else g.fillStyle = 'rgba(247,245,255,.88)';
-        g.textAlign = 'left'; g.fillText(o.t, x, by); x += o.w + space;
-      }
-    });
-    y += (rows.length - 1) * (fs + 20) + 56;
-    g.textAlign = 'center'; g.font = `500 26px ${BODY}`; g.fillStyle = '#8A86AA';
-    g.fillText(`${e.title} · ${e.artist}`, cx, y);
-  }
-  // footer: wordmark + caption on the left, QR code to this word on the right
-  const qs = 150, qx = W - 80 - qs, qy = H - 80 - qs;
-  if (window.qrcode) {
-    const q = qrcode(0, 'M'); q.addData(pageUrl(i, 'sharing', `line${shareLine + 1}`)); q.make();
-    const n = q.getModuleCount(), pad = 12, cell = (qs - pad * 2) / n;
-    g.fillStyle = '#FFFFFF'; rrect(g, qx, qy, qs, qs, 16); g.fill(); g.fillStyle = '#0B0A14';
-    for (let a = 0; a < n; a++) for (let b = 0; b < n; b++) if (q.isDark(a, b)) g.fillRect(Math.floor(qx + pad + b * cell), Math.floor(qy + pad + a * cell), Math.ceil(cell), Math.ceil(cell));
-  }
-  g.textAlign = 'left'; g.font = `800 44px ${DISPLAY}`; g.fillStyle = '#F7F5FF'; g.fillText('Sing', 80, qy + 78);
-  const sw = g.measureText('Sing').width, lw = g.measureText('lish').width; g.fillStyle = grad(80 + sw, 80 + sw + 80); g.fillText('lish', 80 + sw, qy + 78);
-  g.fillStyle = '#F7F5FF'; g.fillText('.study', 80 + sw + lw, qy + 78);   // the wordmark doubles as the address
-  // a "preview" tag after the address, drawn like the site's 完整版 pill: hot-pink outline and text
-  const px = 80 + sw + lw + g.measureText('.study').width + 16;
-  g.font = `700 22px ${BODY}`; const pw = g.measureText('preview').width + 28, ph = 36, py = qy + 78 - 32;
-  g.fillStyle = 'rgba(255,77,141,.12)'; rrect(g, px, py, pw, ph, ph / 2); g.fill();
-  g.strokeStyle = 'rgba(255,77,141,.45)'; g.lineWidth = 2; rrect(g, px, py, pw, ph, ph / 2); g.stroke();
-  g.fillStyle = '#FF9DC0'; g.textBaseline = 'middle'; g.fillText('preview', px + 14, py + ph / 2 + 1); g.textBaseline = 'alphabetic';
-  g.font = `500 24px ${BODY}`; g.fillStyle = '#8A86AA'; g.fillText(SHARE_LINES[shareLine], 80, qy + 122);
-  return new Promise(ok => c.toBlob(ok, 'image/png'));
-}
-let shareFile = null, shareIdx = 0, shareUrl = '', shareLine = 0;
-async function openShare(i) {
-  // one line per poster: the poster slogan, the share text and both links all use it
-  shareLine = store.get('stw.line', 0) % SHARE_LINES.length; store.set('stw.line', shareLine + 1);
-  track('share-open', { word: DATA[i].word, line: shareLine + 1 });
-  shareIdx = i; shareFile = null;
-  const sheet = $('#sheet'), img = $('#sheetImg');
-  sheet.hidden = false; img.hidden = true; $('#sheetBusy').hidden = false;
-  try {
-    const blob = await makeCard(i);
-    shareFile = new File([blob], `singlish-${DATA[i].word}.png`, { type: 'image/png' });
-    if (shareUrl) URL.revokeObjectURL(shareUrl);
-    shareUrl = URL.createObjectURL(blob);
-    // a data: URL (not blob:) so long-press "save image" works in in-app browsers such as WeChat
-    img.src = await new Promise(ok => { const f = new FileReader(); f.onload = () => ok(f.result); f.readAsDataURL(blob); });
-    img.hidden = false; $('#sheetBusy').hidden = true;
-    setShareMode();
-  } catch { $('#sheetBusy').textContent = '分享图生成失败，请检查网络后重试。'; }
-}
-// Phones can't put a download into the photo library; the system share sheet ("Save Image") or a
-// long-press can. In-app browsers (WeChat etc.) have neither share sheet nor downloads: long-press only.
-const touch = matchMedia('(pointer: coarse)').matches, inApp = /MicroMessenger|QQ\/|Weibo|DingTalk|Lark|Feishu/i.test(navigator.userAgent);
-function setShareMode() {
-  const canFiles = !!(navigator.canShare && shareFile && navigator.canShare({ files: [shareFile] }));
-  const save = $('#shareSave'), native = $('#shareNative'), hint = $('#sheetHint');
-  native.hidden = !canFiles;
-  // the share sheet already has "Save Image", so wherever sharing works it is the only button
-  if (canFiles) { save.hidden = true; hint.innerHTML = touch ? '发朋友圈：点「分享」→ 选「微信」→「分享到朋友圈」<br>存相册：点「分享」→「存储图像」' : ''; }
-  else if (touch) { save.hidden = true; hint.innerHTML = '长按图片，保存到相册<br><small>再去朋友圈发表，从相册选这张图</small>'; hint.classList.add('strong'); }
-  else { save.textContent = '保存图片'; save.hidden = false; hint.textContent = ''; }
-  if (inApp) { save.hidden = true; native.hidden = true; hint.innerHTML = '长按图片，保存到相册<br><small>再去朋友圈发表，从相册选这张图</small>'; hint.classList.add('strong'); }
-}
-function closeShare() { $('#sheet').hidden = true; }
-$('#shareClose').addEventListener('click', closeShare);
-$('#sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeShare(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#sheet').hidden) closeShare(); if (e.key === 'Escape' && !$('#survey').hidden) { store.set('stw.survey', 1); closeSurvey(); } });
-$('#shareNative').addEventListener('click', async () => {
-  const e = DATA[shareIdx];
-  const k = shareLine;
-  track('share', { word: e.word, line: k + 1 });
-  try { await navigator.share({ files: [shareFile], title: `Singlish · ${e.word}`, text: `${SHARE_LINES[k]} ${pageUrl(shareIdx, 'share', `line${k + 1}`)}` }); } catch {}
-});
-$('#shareSave').addEventListener('click', async () => {
-  if (!shareUrl) return;
-  if (touch && navigator.canShare?.({ files: [shareFile] })) { try { await navigator.share({ files: [shareFile] }); } catch {} return; }   // → "Save Image"
-  const a = document.createElement('a'); a.href = shareUrl; a.download = shareFile.name; document.body.appendChild(a); a.click(); a.remove();
-});
-document.addEventListener('click', e => { const b = e.target.closest('[data-share]'); if (b) openShare(+b.dataset.share); });
-// 生词本: stays in the current list until the dictionary is switched, so un-starring doesn't yank the card away
-document.addEventListener('click', e => {
-  const b = e.target.closest('[data-fav]'); if (!b) return;
-  const w = DATA[+b.dataset.fav].word, on = !state.fav.has(w);
-  on ? state.fav.add(w) : state.fav.delete(w); store.set('stw.fav', [...state.fav]);
-  document.querySelectorAll(`[data-fav="${b.dataset.fav}"]`).forEach(x => { x.setAttribute('aria-pressed', on); x.textContent = on ? '★' : '☆'; });
-  markCards(true);
-  if (on) track('fav', { word: w, n: state.fav.size });
-});
-
-/* ---------- wiring ---------- */
-document.addEventListener('click', e => {
-  const b = e.target.closest('[data-say]'); if (!b) return;
-  try { const u = new SpeechSynthesisUtterance(b.dataset.say); u.lang = 'en-GB'; u.rate = .85; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch {}
-});
-grid.addEventListener('click', e => {
-  const c = e.target.closest('.card'); if (!c) return;
-  state.started = true; $('#start').hidden = true; prime(+c.dataset.i);
-  $('#browser').classList.remove('open');
-  go(+c.dataset.i, true);
-});
-let searchTimer;
-$('#q').addEventListener('input', () => {
-  renderGrid();
-  clearTimeout(searchTimer);   // log what people settle on, not every keystroke
-  searchTimer = setTimeout(() => { const q = $('#q').value.trim().toLowerCase(); if (q.length > 1) track('search', { q }); }, 1500);
-});
-function applyDict(d, keepWord) {
-  if (d === 'fav' && !state.fav.size) {
-    if (DATA.length) { $('#countLine').textContent = '还没有收藏：点单词卡右上角的 ☆ 就能加进生词本'; return; }
-    d = 'all';   // first load with an emptied 生词本: don't open on a blank list
-  }
-  if (!ALL.some(e => inDict(e, d))) d = 'all';
-  state.dict = d; store.set('stw.dict', d);
-  $('#dictChips').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x.dataset.d === d));
-  $('#listName').textContent = d === 'all' ? '全部' : d === 'fav' ? '收藏' : DICT_NAME[d];   // the header button names the list you're in
-  stop(); lyr.clear(); filled.clear(); carousel.innerHTML = ''; hist.length = 0;
-  DATA = d === 'all' ? ALL : ALL.filter(e => inDict(e, d));
-  state.cur = Math.max(0, DATA.findIndex(e => e.word === keepWord));
-  $('#totalCount').textContent = DATA.length;
-  renderGrid(); applyMode();
-}
-$('#dictChips').addEventListener('click', e => { const b = e.target.closest('button'); if (b) track('dict', { dict: b.dataset.d }); if (b) applyDict(b.dataset.d, DATA[state.cur]?.word); });
-function switchClip(i, dir = 1) {
-  const en = DATA[i]; if (!en || en.clips.length < 2) return;
-  prime(i); state.started = true;
-  useClip(en, (en.ci + dir + en.clips.length) % en.clips.length); lyr.delete(i);
-  store.set('stw.pos', { word: en.word, ci: en.ci });
-  stop();
-  if (isMobile()) { const sl = carousel.children[i]; if (sl) sl.innerHTML = stageHTML(i); } else deskStage.innerHTML = stageHTML(i);
-  const st = currentRoot();
-  st?.classList.add(dir > 0 ? 'swap-up' : 'swap-down');   // new song slides in from the direction of the gesture
-  P.root = st; fillLyrics(i, P.root); setDeck(i); setArt(i); renderGrid();
-  play(i);
-}
-document.addEventListener('click', e => {
-  const d = e.target.closest('[data-clipto]'); if (!d) return;
-  const [i, k] = d.dataset.clipto.split(':').map(Number), en = DATA[i]; if (k === en.ci) return;
-  switchClip(i, k - en.ci);
-});
-// phones: drag the card up / down to change song (left / right still changes word).
-// The card follows the finger; a long or fast enough drag flings it out and the next song slides in.
-let drag = null;
-carousel.addEventListener('touchstart', e => {
-  if (e.touches.length !== 1) { drag = null; return; }
-  const t = e.touches[0], sl = e.target.closest('.slide');
-  drag = sl ? { x: t.clientX, y: t.clientY, at: Date.now(), sl, axis: null, dy: 0 } : null;
-}, { passive: true });
-carousel.addEventListener('touchmove', e => {
-  if (!drag) return;
-  const t = e.touches[0], dx = t.clientX - drag.x, dy = t.clientY - drag.y;
-  if (!drag.axis) {
-    if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
-    const i = +drag.sl.dataset.i, sl = drag.sl, stage = sl.querySelector('.stage');
-    const vertical = Math.abs(dy) > Math.abs(dx) * 1.2;
-    const scrollable = sl.scrollHeight > sl.clientHeight + 2 && !((dy < 0 && sl.scrollTop + sl.clientHeight >= sl.scrollHeight - 2) || (dy > 0 && sl.scrollTop <= 2));
-    drag.axis = vertical && i === state.cur && DATA[i]?.clips.length > 1 && stage && !scrollable ? 'y' : 'x';
-    if (drag.axis === 'y') { drag.stage = stage; stage.style.transition = 'none'; }
-  }
-  if (drag.axis !== 'y') return;
-  e.preventDefault();                                   // keep the carousel from scrolling sideways meanwhile
-  drag.dy = dy;
-  const f = dy * .55;                                   // a little resistance
-  drag.stage.style.transform = `translateY(${f}px)`;
-  drag.stage.style.opacity = String(Math.max(.35, 1 - Math.abs(f) / 420));
-}, { passive: false });
-carousel.addEventListener('touchend', () => {
-  if (!drag || drag.axis !== 'y') { drag = null; return; }
-  const { stage, dy, at } = drag, i = +drag.sl.dataset.i; drag = null;
-  const fast = Math.abs(dy) / Math.max(1, Date.now() - at) > .45;
-  const ease = 'transform .22s cubic-bezier(.3,.7,.3,1), opacity .22s';
-  if (Math.abs(dy) > 70 || (fast && Math.abs(dy) > 24)) {
-    stage.style.transition = ease;
-    stage.style.transform = `translateY(${dy < 0 ? '-40%' : '40%'})`; stage.style.opacity = '0';
-    setTimeout(() => switchClip(i, dy < 0 ? 1 : -1), 170);
-  } else {                                              // not far enough: spring back
-    stage.style.transition = 'transform .3s cubic-bezier(.2,1.4,.4,1), opacity .25s';
-    stage.style.transform = ''; stage.style.opacity = '';
-  }
-});
-carousel.addEventListener('touchcancel', () => { if (drag?.stage) { drag.stage.style.transition = 'transform .25s, opacity .25s'; drag.stage.style.transform = ''; drag.stage.style.opacity = ''; } drag = null; });
-$('#play').addEventListener('click', () => { prime(state.cur); state.started = true; $('#start').hidden = true; toggle(); });
-$('#prev').addEventListener('click', () => { prime(state.cur); state.started = true; goPrev(); });
-$('#next').addEventListener('click', () => { prime(state.cur); state.started = true; goNext(); });
-$('#replay').addEventListener('click', () => { prime(state.cur); state.started = true; play(state.cur); });
-const tog = (id, key) => { const b = $(id); b.setAttribute('aria-pressed', !!state[key]); b.addEventListener('click', () => { state[key] = !state[key]; b.setAttribute('aria-pressed', state[key]); if (key === 'shuffle') store.set('stw.shuffle', state.shuffle); }); };
-tog('#shuffle', 'shuffle'); tog('#loop', 'loop');
-// the whole gate is tappable, not just the button
-$('#start').addEventListener('click', () => { prime(state.cur); state.started = true; $('#start').hidden = true; play(state.cur); });
-function openList() {
-  const panel = $('#browser'); panel.classList.add('open');
-  const c = grid.querySelector('.card.on');   // scroll the panel itself; scrollIntoView could also move the page on iOS
-  if (c) panel.scrollTop = c.offsetTop - panel.clientHeight / 2 + c.offsetHeight / 2;
-}
-$('#openList').addEventListener('click', openList);
-$('#closeList').addEventListener('click', () => $('#browser').classList.remove('open'));
-document.addEventListener('keydown', e => {
-  if (e.target.matches('input,select,textarea')) return;
-  if (['ArrowRight', 'ArrowLeft', ' '].includes(e.key)) prime(state.cur);
-  if (e.key === 'ArrowUp' || e.key === 'ArrowDown') { if (DATA[state.cur]?.clips.length > 1) { e.preventDefault(); switchClip(state.cur, e.key === 'ArrowDown' ? 1 : -1); } return; }
-  if (e.key === 'ArrowRight') { e.preventDefault(); state.started = true; goNext(); }
-  else if (e.key === 'ArrowLeft') { e.preventDefault(); state.started = true; goPrev(); }
-  else if (e.key === ' ') { e.preventDefault(); state.started = true; toggle(); }
-});
-function applyMode() {
-  stop();
-  if (isMobile()) { if (store.get('stw.seen', 0)) $('#start').hidden = true; buildCarousel(); requestAnimationFrame(() => go(state.cur, false)); }
-  else { $('#start').hidden = true; go(state.cur, false); }
-}
-mq.addEventListener('change', applyMode);
-
-try { history.scrollRestoration = 'manual'; } catch {}
-const pinTop = () => { if (isMobile() && (scrollY || document.documentElement.scrollTop)) scrollTo(0, 0); };
-addEventListener('scroll', pinTop, { passive: true });
-addEventListener('resize', pinTop);
-visualViewport?.addEventListener('resize', pinTop);
-renderGrid();
-fetch('preview.json')   /* the 100-word preview set; the full bank lives in data.json */.then(r => r.json()).then(list => {
-  for (const e of list) for (const c of e.clips) { c.preview = expand(c.preview); c.art = expand(c.art); c.appleUrl = expand(c.appleUrl); }
-  list.forEach(e => useClip(e, 0));
-  ALL = list;
-  // deep link from a shared card: #word opens that word, switching to 全部 if the chosen dictionary lacks it
-  // no #word: pick up where this browser left off, on the same song
-  const pos = store.get('stw.pos', null), w = decodeURIComponent(location.hash.slice(1)) || pos?.word || '';
-  const back = pos && ALL.find(e => e.word === pos.word && e.word === w);
-  if (back && pos.ci > 0 && pos.ci < back.clips.length) useClip(back, pos.ci);
-  const has = ALL.some(e => e.word === w && inDict(e, state.dict));
-  applyDict(w && ALL.some(e => e.word === w) && !has ? 'all' : state.dict, w || null);
-}).catch(() => { grid.innerHTML = '<p class="empty">词库加载失败，请检查网络后刷新。</p>'; });
-// a #word typed into the address bar (or another shared link opened in this tab) jumps to that word
-addEventListener('hashchange', () => {
-  const w = decodeURIComponent(location.hash.slice(1)); if (!w || DATA[state.cur]?.word === w) return;
-  const k = DATA.findIndex(e => e.word === w);
-  if (k >= 0) go(k, false); else if (ALL.some(e => e.word === w)) applyDict('all', w);
-});
-})();
-</script>
 </body>
 </html>
