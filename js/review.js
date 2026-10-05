@@ -1,7 +1,7 @@
-import { getQuizPool, getUserWords, saveReviewState } from './plan-api.js?v=prod-9dd816f';
-import { track } from './track.js?v=prod-9dd816f';
-import { idxOf } from './bank.js?v=prod-9dd816f';
-import { loadLyrics } from './lyrics.js?v=prod-9dd816f';
+import { getQuizPool, getUserWords, saveReviewState } from './plan-api.js?v=prod-9d3c5bf';
+import { track } from './track.js?v=prod-9d3c5bf';
+import { idxOf } from './bank.js?v=prod-9d3c5bf';
+import { loadLyrics } from './lyrics.js?v=prod-9d3c5bf';
 
 const KEY = 'stw.auth.session';
 const LIMIT = 10;
@@ -205,7 +205,7 @@ let advanceTimer = 0;
 
 let learnMod = null;
 async function learn() {
-  if (!learnMod) { try { learnMod = await import('./learn.js?v=prod-9dd816f'); } catch { console.warn('review: learn.js import failed — mutual-exclusion check skipped'); } }
+  if (!learnMod) { try { learnMod = await import('./learn.js?v=prod-9d3c5bf'); } catch { console.warn('review: learn.js import failed — mutual-exclusion check skipped'); } }
   return learnMod;
 }
 
@@ -231,6 +231,12 @@ export async function startReview() {
   if (state !== 'idle') { console.warn('review: startReview ignored — a review session is already active'); return; }
   const s = read(), uid = s?.user_id;
   if (!s?.access_token || !uid) { console.warn('review: startReview ignored — not logged in'); return; }
+  setMode('review');
+  await startReviewBody(uid);
+  if (state === 'idle') setMode(null);
+}
+
+async function startReviewBody(uid) {
   const learned = await reviewableWords(uid);
   if (!learned.length) { console.warn('review: startReview ignored — nothing to review (nothing learned or nothing due yet)'); return; }
   const pool = await getQuizPool();

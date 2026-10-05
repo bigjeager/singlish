@@ -1,11 +1,11 @@
-import { ALL, DATA, state, trial, inDict, idxOf } from './bank.js?v=prod-9dd816f';
-import { store, isMobile } from './util.js?v=prod-9dd816f';
-import { track } from './track.js?v=prod-9dd816f';
-import { loadLyrics } from './lyrics.js?v=prod-9dd816f';
-import { grid, carousel, renderGrid, markCards } from './stage.js?v=prod-9dd816f';
-import { P, primeAudio, play, toggle, deferAdvance } from './player.js?v=prod-9dd816f';
-import { go, goNext, sessionStep, switchClip, applyDict, activeSession, setSessionNav } from './nav.js?v=prod-9dd816f';
-import { openShare } from './share.js?v=prod-9dd816f';
+import { ALL, DATA, state, trial, inDict, idxOf } from './bank.js?v=prod-9d3c5bf';
+import { store, isMobile } from './util.js?v=prod-9d3c5bf';
+import { track } from './track.js?v=prod-9d3c5bf';
+import { loadLyrics } from './lyrics.js?v=prod-9d3c5bf';
+import { grid, carousel, renderGrid, markCards } from './stage.js?v=prod-9d3c5bf';
+import { P, primeAudio, play, toggle, deferAdvance } from './player.js?v=prod-9d3c5bf';
+import { go, goNext, sessionStep, switchClip, applyDict, activeSession, setSessionNav } from './nav.js?v=prod-9d3c5bf';
+import { openShare } from './share.js?v=prod-9d3c5bf';
 
 function $(s) { return document.querySelector(s); }
 
@@ -101,6 +101,7 @@ $('#play').addEventListener('click', () => { primeAudio(state.cur); state.starte
 $('#prev').addEventListener('click', () => { primeAudio(state.cur); state.started = true; sessionStep(-1); });
 $('#next').addEventListener('click', () => { primeAudio(state.cur); state.started = true; sessionStep(1); });
 $('#replay').addEventListener('click', () => { primeAudio(state.cur); state.started = true; play(state.cur); });
+$('#cdCtl').addEventListener('click', () => { primeAudio(state.cur); state.started = true; if (P.ended) play(state.cur); else toggle(); });
 
 const tog = (id, key) => { const b = $(id); b.setAttribute('aria-pressed', !!state[key]); b.addEventListener('click', () => { state[key] = !state[key]; b.setAttribute('aria-pressed', state[key]); if (key === 'shuffle') store.set('stw.shuffle', state.shuffle); }); };
 tog('#shuffle', 'shuffle'); tog('#loop', 'loop');
