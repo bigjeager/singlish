@@ -1,10 +1,10 @@
-import { ALL, DATA, setAll, setData, state, trial, inDict, fromMeta, stubify, ensureDetail, useClip, trialMeta } from './bank.js?v=prod-9d3c5bf';
-import { store, expand, isMobile, DICT_NAME, fmt } from './util.js?v=prod-9d3c5bf';
-import { getBankList, readBankCache, saveBankCache, revalidateBank } from './plan-api.js?v=prod-9d3c5bf';
-import { lyr, loadLyrics, fillLyrics } from './lyrics.js?v=prod-9d3c5bf';
-import { grid, deskStage, carousel, stageHTML, renderGrid, markCards, fillSlides, clearFilled } from './stage.js?v=prod-9d3c5bf';
-import { P, stop, currentRoot, play, cue, primeAudio, deferAdvance } from './player.js?v=prod-9d3c5bf';
-import { syncCarouselClose } from './wiring.js?v=prod-9d3c5bf';
+import { ALL, DATA, setAll, setData, state, trial, inDict, fromMeta, stubify, ensureDetail, useClip, trialMeta } from './bank.js?v=prod-a241178';
+import { store, expand, isMobile, DICT_NAME, fmt } from './util.js?v=prod-a241178';
+import { getBankList, readBankCache, saveBankCache, revalidateBank } from './plan-api.js?v=prod-a241178';
+import { lyr, loadLyrics, fillLyrics } from './lyrics.js?v=prod-a241178';
+import { grid, deskStage, carousel, stageHTML, renderGrid, markCards, fillSlides, clearFilled } from './stage.js?v=prod-a241178';
+import { P, stop, currentRoot, play, cue, primeAudio, deferAdvance } from './player.js?v=prod-a241178';
+import { syncCarouselClose } from './wiring.js?v=prod-a241178';
 
 let suppressScroll = false, scrollT = 0;
 let sessionNav = false;

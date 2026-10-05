@@ -1,5 +1,5 @@
-import { DATA } from './bank.js?v=prod-9d3c5bf';
-import { esc } from './util.js?v=prod-9d3c5bf';
+import { DATA } from './bank.js?v=prod-a241178';
+import { esc } from './util.js?v=prod-a241178';
 
 let glossTimer = 0;
 
