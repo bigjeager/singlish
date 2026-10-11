@@ -1,11 +1,11 @@
-import { ALL, DATA, state, trial, inDict, idxOf } from './bank.js?v=prod-dc2ee67';
-import { store, isMobile } from './util.js?v=prod-dc2ee67';
-import { track } from './track.js?v=prod-dc2ee67';
-import { loadLyrics } from './lyrics.js?v=prod-dc2ee67';
-import { grid, carousel, renderGrid, markCards } from './stage.js?v=prod-dc2ee67';
-import { P, primeAudio, play, toggle, deferAdvance } from './player.js?v=prod-dc2ee67';
-import { go, goNext, sessionStep, switchClip, applyDict, activeSession, setSessionNav } from './nav.js?v=prod-dc2ee67';
-import { openShare } from './share.js?v=prod-dc2ee67';
+import { ALL, DATA, state, trial, inDict, idxOf } from './bank.js?v=prod-87428fe';
+import { store, isMobile } from './util.js?v=prod-87428fe';
+import { track } from './track.js?v=prod-87428fe';
+import { loadLyrics } from './lyrics.js?v=prod-87428fe';
+import { grid, carousel, renderGrid, markCards } from './stage.js?v=prod-87428fe';
+import { P, primeAudio, play, toggle, deferAdvance } from './player.js?v=prod-87428fe';
+import { go, goNext, sessionStep, switchClip, applyDict, activeSession, setSessionNav } from './nav.js?v=prod-87428fe';
+import { openShare } from './share.js?v=prod-87428fe';
 
 function $(s) { return document.querySelector(s); }
 

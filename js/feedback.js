@@ -1,4 +1,4 @@
-import { AUTH_CONFIG } from './config.js?v=prod-dc2ee67';
+import { AUTH_CONFIG } from './config.js?v=prod-87428fe';
 
 (() => {
 const KEY = 'stw.auth.session';

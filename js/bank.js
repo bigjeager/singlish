@@ -1,6 +1,6 @@
-import { AUTH_CONFIG } from './config.js?v=prod-dc2ee67';
-import { getWordClips } from './plan-api.js?v=prod-dc2ee67';
-import { store, useClip, expand } from './util.js?v=prod-dc2ee67';
+import { AUTH_CONFIG } from './config.js?v=prod-87428fe';
+import { getWordClips } from './plan-api.js?v=prod-87428fe';
+import { store, useClip, expand } from './util.js?v=prod-87428fe';
 
 export { useClip };
 

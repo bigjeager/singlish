@@ -1,7 +1,7 @@
-import { getQuizPool, getUserWords, saveReviewState } from './plan-api.js?v=prod-dc2ee67';
-import { track } from './track.js?v=prod-dc2ee67';
-import { idxOf } from './bank.js?v=prod-dc2ee67';
-import { loadLyrics } from './lyrics.js?v=prod-dc2ee67';
+import { getQuizPool, getUserWords, saveReviewState } from './plan-api.js?v=prod-87428fe';
+import { track } from './track.js?v=prod-87428fe';
+import { idxOf } from './bank.js?v=prod-87428fe';
+import { loadLyrics } from './lyrics.js?v=prod-87428fe';
 
 const KEY = 'stw.auth.session';
 const LIMIT = 10;
@@ -205,7 +205,7 @@ let advanceTimer = 0;
 
 let learnMod = null;
 async function learn() {
-  if (!learnMod) { try { learnMod = await import('./learn.js?v=prod-dc2ee67'); } catch { console.warn('review: learn.js import failed — mutual-exclusion check skipped'); } }
+  if (!learnMod) { try { learnMod = await import('./learn.js?v=prod-87428fe'); } catch { console.warn('review: learn.js import failed — mutual-exclusion check skipped'); } }
   return learnMod;
 }
 
